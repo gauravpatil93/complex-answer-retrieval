@@ -1,7 +1,4 @@
-import itertools
-from trec_car.format_runs import *
 from trec_car.read_data import *
-from pprint import pprint
 from nltk.corpus import stopwords
 import re
 from stemming.porter2 import stem
@@ -11,25 +8,24 @@ class Ranking:
 
     stop_words = stopwords.words('english')
 
-    def __init__(self, outline_file: str, paragraph_file: str, output_file: str):
+    def __init__(self, outline_file, paragraph_file, output_file):
         self.outline_file = outline_file
         self.paragraph_file = paragraph_file
         self.output_file = output_file
-        self.pages = self.get_pages()
-        self.queries = self.get_queries()
-        self.paragraphs = self.get_paragraphs()
+        self.pages = self.gather_pages()
+        self.queries = self.gather_queries()
+        self.paragraphs = self.gather_paragraphs()
 
-    def get_pages(self):
+    def gather_pages(self):
         with open(self.outline_file, 'rb') as f:
             pages = [p for p in itertools.islice(iter_annotations(f), 0, 1000)]
         return pages
 
-    def get_paragraphs(self):
+    def gather_paragraphs(self):
         id_to_text_dict = dict()
         with open(self.paragraph_file, 'rb') as f:
-            for p in itertools.islice(iter_paragraphs(f), 0, 500):
+            for p in itertools.islice(iter_paragraphs(f), 0, 1000):
                 id_to_text_dict[p.para_id] = Ranking.process_text(p.get_text())
-        pprint(id_to_text_dict)
         return id_to_text_dict
 
     @staticmethod
@@ -51,18 +47,18 @@ class Ranking:
                 ranked_dict[word] = 1
         return ranked_dict
 
-    def get_queries(self):
+    def gather_queries(self):
+        query_tup_list = []
         for page in self.pages:
             for section_path in page.flat_headings_list():
                 query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
+                query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
+                tup = (query_id_plain, query_id_formatted, Ranking.process_text(query_id_plain))
+                query_tup_list.append(tup)
+        return query_tup_list
 
+    def get_queries(self):
+        return self.queries
 
-
-
-
-
-
-
-#pprint(Ranking.process_text("According to the OECD NEA report on Chernobyl (ten years on), the following proportions of the core inventory were released."))
-obj =  Ranking("spritzer.cbor.outlines", "spritzer.cbor.paragraphs", "output.run")
-#print(Ranking.process_text("According to the OECD NEA report on Chernobyl (ten years on), the following proportions of the core inventory were released.").split())
+    def get_paragraphs(self):
+        return self.paragraphs
