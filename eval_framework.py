@@ -153,7 +153,6 @@ def perform_evaluation(qrels, run):
     qrelsCollection = load_qrels(qrels)
     return load_rankings_and_compute_eval (qrelsCollection, run)
 
-
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Mock  dont use for anything but testing")
@@ -162,7 +161,7 @@ def main():
     parser.add_argument('--querybyquery', type=bool, help='Print query-by-query evaluation results')
     args = parser.parse_args()
     (avgeval, fulleval) = perform_evaluation(args.qrels, args.run)
-    print (avgeval)
+    print(avgeval)
 
     if(args.querybyquery):
         print("\n")

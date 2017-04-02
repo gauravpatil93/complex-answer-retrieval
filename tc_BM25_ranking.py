@@ -22,6 +22,7 @@ class BM25:
     def inverse_document_frequency(self, query_word):
         no_qi = self.no_of_documents_containing_a_word(query_word)
         return float(math.log(self.no_of_documents / (no_qi + 1.0)))
+        #return float((self.no_of_documents - no_qi + 0.5)/(no_qi + 0.5))
 
     def no_of_documents_containing_a_word(self, query_word):
         count = 0
@@ -44,12 +45,14 @@ class BM25:
 
     def bm25_score(self, query, document_id):
         score = 0
-        const_value = self.constant_value_optimization(document_id)
+        #const_value = self.constant_value_optimization(document_id)
+        document_length = 0
+        for k, v in self.documents[document_id].items():
+            document_length += v
         for key, value in query[2].items():
             term_freq = self.word_frequency_of_word_in_document(key, document_id)
-            score += self.inverse_document_frequency(key) * (
-                (term_freq * self.k_plus_one) / float(term_freq + const_value))
+            #score += self.inverse_document_frequency(key) * (
+            #    (term_freq * self.k_plus_one) / float(term_freq + const_value))
+            score += self.inverse_document_frequency(key) * (self.k_plus_one * term_freq) / (self.k * (1.0 - self.b + self.b * (document_length/ self.average_length_of_all_documents)) + term_freq )
         tup = (query[1], document_id, score)
         return tup
-
-
