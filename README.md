@@ -87,7 +87,7 @@ However, crashes for runs with large sizes of number of clusters (number of quer
 
 A more efficient method for assigning queries to clusters will be needed for applied use. Almost synced up to run on modified
 results for Dirchilets smoothing algorithm but the above problem prevents that.
-Not correctly functioning source code for that in trec_cluster_full
+Not correctly functioning source code for that in trec_cluster_full. For evaluation of how that is coming along the code files not identical to an iteration of Gaurav's implementation are trec_cluster_generate_document.py (the main program file), and cluster_kmeans.py (a callable version of the kmeans clustering and mapping returning rankings). trec_cluster_Ranking.py just has slight modifications to Gaurav's ranking class to have his code give output processable by clustering.
 ```
 
 
