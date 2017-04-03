@@ -60,8 +60,16 @@ eval framework from trec_car
 
 eval_framework.py [qrels] [run]
 ```
-# Sample Clustering Implementation
-  in folder trec_cluster_basic run the run.sh script 
+# Clustering Implementation
+```
+  Implemented by Colin
+  in folder trec_cluster_basic run the run.sh script to get a sample clustering followed by ranking
+  Accepts inputs and explains possible input values on running with no arguments.
+  However, crashes for runs with large sizes of number of clusters (number of queries)
+  
+  Almost synced up to run on modified results for Dirchilets smoothing algorithm but the above problem prevents that,
+  not correctly functioning source code for that in trec_cluster_full
+```
   
 # Results 
 
