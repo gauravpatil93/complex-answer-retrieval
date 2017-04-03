@@ -128,5 +128,5 @@ map=0.223)
 ```
 Gaurav Patil: BM25, BM25+, DIRICHLETS, TFIDF Improved, Text Processing Algorithms and Cachcing 
 Colin Etzel : Implemented clustering and work towards integrating with DIRICHLETS (see section "Clustering Implementation")
-Shilpa Dhagat: Entity linking implementation with Tagme using both annotations and metions(spots) and Greedy       interpretation finding algorithm
+Shilpa Dhagat: Entity linking implementation with Tagme using both annotations and metions(spots) for queries and paragraphs and Greedy interpretation finding algorithm 
 ```
