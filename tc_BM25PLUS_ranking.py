@@ -50,5 +50,3 @@ class BM25PLUS:
             score += self.modified_idf_calculation(key) * (((self.k_plus_one * word_freq_in_document) / ((self.k * ((1 - self.b) + self.b + (document_length / self.average_length_of_all_documents))) + word_freq_in_document)) + self.delta)
         tup = (query[1], document_id, score)
         return tup
-
-

@@ -4,6 +4,11 @@ import math
 class BM25:
 
     def __init__(self, query_structure, document_structure):
+        """
+        Constructor takes the query structure and the document structure
+        :param query_structure: tuple (query_id_plain, query_id_formatted, Ranked dict of words))
+        :param document_structure: dictionary  consisting of document id mapping to the ranked dict of words
+        """
         self.queries = query_structure
         self.documents = document_structure
         self.no_of_documents = len(self.documents.keys())
@@ -13,6 +18,10 @@ class BM25:
         self.k_plus_one = self.k + 1
 
     def average_length_of_documents(self):
+        """
+        Calculates the the average length of documents
+        :return: average length of documents
+        """
         summ = 0
         for key, value in self.documents.items():
             for k, v in value.items():
@@ -22,7 +31,6 @@ class BM25:
     def inverse_document_frequency(self, query_word):
         no_qi = self.no_of_documents_containing_a_word(query_word)
         return float(math.log(self.no_of_documents / (no_qi + 1.0)))
-        #return float((self.no_of_documents - no_qi + 0.5)/(no_qi + 0.5))
 
     def no_of_documents_containing_a_word(self, query_word):
         count = 0
@@ -37,22 +45,15 @@ class BM25:
         else:
             return 0
 
-    def constant_value_optimization(self, document_id):
-        document_length = 0
-        for k, v in self.documents[document_id].items():
-            document_length += v
-        return float(self.k * (1 - self.b + (self.b * document_length / self.average_length_of_all_documents)))
-
     def bm25_score(self, query, document_id):
         score = 0
-        #const_value = self.constant_value_optimization(document_id)
         document_length = 0
         for k, v in self.documents[document_id].items():
             document_length += v
         for key, value in query[2].items():
             term_freq = self.word_frequency_of_word_in_document(key, document_id)
-            #score += self.inverse_document_frequency(key) * (
-            #    (term_freq * self.k_plus_one) / float(term_freq + const_value))
-            score += self.inverse_document_frequency(key) * (self.k_plus_one * term_freq) / (self.k * (1.0 - self.b + self.b * (document_length/ self.average_length_of_all_documents)) + term_freq )
+            score += self.inverse_document_frequency(key) * (self.k_plus_one * term_freq) / \
+                     (self.k * (1.0 - self.b + self.b * (document_length/ self.average_length_of_all_documents))
+                      + term_freq )
         tup = (query[1], document_id, score)
         return tup
