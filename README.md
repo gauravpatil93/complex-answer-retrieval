@@ -4,6 +4,7 @@ Repository contains code submission for CS 980 (Data Science) assignments
 ```
 List of dependencies:
 
+Python 3       :https://www.continuum.io/downloads#linux
 NLTK           :conda install -c anaconda nltk=3.2.2
 TREC_CAR_TOOLS :https://github.com/TREMA-UNH/trec-car-tools
 RE             :Regular expressions
