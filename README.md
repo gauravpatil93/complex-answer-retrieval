@@ -107,6 +107,21 @@ using test 200's hierarchichal qrel file and 4000 passages from training data
 map - 0.2782
 r-prec - 0.2303
 
+Entity linking performance:
+
+mrr = 0.341,
+p@5=0.126,
+r-prec=0.191,
+map=0.230
+
+Baseline approach
+
+mrr=0.30,
+p@5=0.11,
+r-prec=0.182,
+map=0.223)
+
+
 ```
 
 # Contributions
