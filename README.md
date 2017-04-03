@@ -64,7 +64,9 @@ eval framework from trec_car
 
 eval_framework.py [qrels] [run]
 ```
-
+# sample clustering implementation
+  in folder trec_cluster_basic run the run.sh script 
+  
 # Results 
 
 
