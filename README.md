@@ -112,6 +112,6 @@ r-prec - 0.2303
 # Contributions
 ```
 Gaurav Patil: BM25, BM25+, DIRICHLETS, TFIDF Improved, Text Processing Algorithms and Cachcing 
-Colin Etzel : Implmented clustering 
+Colin Etzel : Implemented clustering and work towards integrating with DIRICHLETS (see section "Clustering Implementation")
 Shilpa Dhagat: Entity linking implementation with Tagme using both annotations and metions(spots) and Greedy       interpretation finding algorithm
 ```
