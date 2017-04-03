@@ -4,7 +4,6 @@ Repository contains code submission for CS 980 (Data Science) assignments
 ```
 List of dependencies:
 
-Python 3       :https://www.continuum.io/downloads#linux
 NLTK           :conda install -c anaconda nltk=3.2.2
 TREC_CAR_TOOLS :https://github.com/TREMA-UNH/trec-car-tools
 RE             :Regular expressions
@@ -14,6 +13,7 @@ argparse       :conda install -c anaconda argparse=1.3.0
 numpy          :conda install -c anaconda numpy=1.12.1 
 scipy          :conda install -c anaconda scipy=0.19.0
 scikit-learn   :conda install scikit-learn
+TagMe          : pip install tagme (GCUBE_TOKEN = "bfbfb535-3683-47c0-bd11-df06d5d96726-843339462")
 ```
 ```
 Running the code:
@@ -46,6 +46,22 @@ tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output
 tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run TFIDFIMPROVED cache 50000
 ```
 
+
+```
+Running the code with or without entity linking:
+
+This script runs using main approach with entity linking on test200 data
+
+chmod +x entitylinking.run.sh
+./entitylinking.run.sh
+
+This script runs using baseline approach (BM25) on test200 data
+
+chmod +x baseline.run.sh
+./baseline.run.sh
+
+```
+
 # NOTE
 ```
 Important note about caching. cPickle has limitations to the amount of data that it can serizalize and store so after running a test on 7 million passages trying to cache them proved that indexes of such a large data set cannot be cached
@@ -63,17 +79,18 @@ eval_framework.py [qrels] [run]
 ```
 # Clustering Implementation
 ```
-  Implemented by Colin
-  in folder trec_cluster_basic run the run.sh script to get a sample clustering followed by ranking
-  Accepts inputs and explains possible input values on running with no arguments.
-  However, crashes for runs with large sizes of number of clusters (number of queries).
-  
-  
-  A more efficient method for assigning queries to clusters will be needed for applied use. Almost synced up to run on modified
-  results for Dirchilets smoothing algorithm but the above problem prevents that.
-  Not correctly functioning source code for that in trec_cluster_full
+Implemented by Colin
+in folder trec_cluster_basic run the run.sh script to get a sample clustering followed by ranking
+Accepts inputs and explains possible input values on running with no arguments.
+However, crashes for runs with large sizes of number of clusters (number of queries).
+
+
+A more efficient method for assigning queries to clusters will be needed for applied use. Almost synced up to run on modified
+results for Dirchilets smoothing algorithm but the above problem prevents that.
+Not correctly functioning source code for that in trec_cluster_full
 ```
-  
+
+
 # Results 
 
 ```
@@ -95,5 +112,5 @@ r-prec - 0.2303
 ```
 Gaurav Patil: BM25, BM25+, DIRICHLETS, TFIDF Improved, Text Processing Algorithms and Cachcing 
 Colin Etzel : Implmented clustering 
-Shilpa Dhagat:
+Shilpa Dhagat: Entity linking implementation with Tagme using both annotations and metions(spots) and Greedy       interpretation finding algorithm
 ```
