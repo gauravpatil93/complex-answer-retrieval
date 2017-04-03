@@ -50,6 +50,7 @@ class Ranking:
             for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query(p.get_text())
         if self.enable_cache is True:
+            print(" Paragraph cache created successfully ")
             _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "cache/paragraph_structure"), "wb"))
         return id_to_text_dict
 
@@ -90,6 +91,7 @@ class Ranking:
                 tup = (query_id_plain, query_id_formatted, Ranking.process_text_query(query_id_plain))
                 query_tup_list.append(tup)
         if self.enable_cache is True:
+            print(" Query cache created successfully ")
             _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/query_structure_cache"), "wb"))
         return query_tup_list
 

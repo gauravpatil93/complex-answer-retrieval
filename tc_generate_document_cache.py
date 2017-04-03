@@ -38,6 +38,7 @@ for elem in query_structure:
                     no_of_docs_with_term[key] += 1
                 else:
                     no_of_docs_with_term[key] = 1
+print(" no_of_docs_with_term cache create successfully ")
 _pickle.dump(no_of_docs_with_term, open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "wb"))
 
 
@@ -46,6 +47,7 @@ summ = 0
 for para_id, ranked_words_dict in document_structure.items():
     summ += sum(ranked_words_dict.values())
 average = summ / float(len(document_structure))
+print(" average_length_cache cache create successfully ")
 _pickle.dump(average, open(os.path.join(os.curdir, "cache/average_length_of_documents"), "wb"))
 
 
@@ -53,6 +55,7 @@ _pickle.dump(average, open(os.path.join(os.curdir, "cache/average_length_of_docu
 # Total no of words in the collection
 for elem in query_structure:
     summ += sum(elem[2].values())
+print(" no of words in collection cache create successfully ")
 _pickle.dump(summ, open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "wb"))
 
 # Frequency of all terms in the dictionary
@@ -70,6 +73,7 @@ for ele in query_structure:
             all_terms_frequency_dict[kkkkk] += vvvvv
         else:
             all_terms_frequency_dict[kkkkk] = vvvvv
+print(" all_terms_freq_dict cache create successfully ")
 _pickle.dump(all_terms_frequency_dict, open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "wb"))
 
 

@@ -9,6 +9,11 @@ BM25+
 class BM25PLUS:
 
     def __init__(self, query_structure, document_structure):
+        """
+        Constructor takes the query structure and the document structure
+        :param query_structure: tuple (query_id_plain, query_id_formatted, Ranked dict of words))
+        :param document_structure: dictionary  consisting of document id mapping to the ranked dict of words
+        """
         self.queries = query_structure
         self.documents = document_structure
         self.no_of_documents = len(self.documents)
@@ -20,15 +25,29 @@ class BM25PLUS:
         self.cache = dict()
 
     def average_document_length(self):
+        """
+        Calculates the the average length of documents
+        :return: average length of documents
+        """
         summ = 0
         for para_id, ranked_words_dict in self.documents.items():
             summ += sum(ranked_words_dict.values())
         return summ/float(self.no_of_documents)
 
     def modified_idf_calculation(self, query_word):
+        """
+        Takes the query term and returns the inverse document for a query term
+        :param query_word: string
+        :return: float: idf value
+        """
         return math.log((self.no_of_documents + 1) / (self.no_of_documents_containing_a_word(query_word) + 0.5))
 
     def no_of_documents_containing_a_word(self, query_word):
+        """
+        Given a query term returns the no of documents containing the word
+        :param query_word: 
+        :return: 
+        """
         if query_word in self.cache:
             return self.cache[query_word]
         else:
@@ -40,6 +59,12 @@ class BM25PLUS:
             return float(no_of_documents_having_the_word)
 
     def word_frequency_of_word_in_document(self, word, document_id):
+        """
+        Finds the frequency of a word in the document
+        :param word: string
+        :param document_id: string
+        :return: int occurrence of the word
+        """
         ranked_words_dict = self.documents[document_id]
         if word in ranked_words_dict:
             return ranked_words_dict[word]
@@ -47,6 +72,12 @@ class BM25PLUS:
             return 0
 
     def score(self, query, document_id):
+        """
+        Given a query and a document calculates the score
+        :param query: tuple
+        :param document_id: string
+        :return: tuple (formatted_query, document_id, score) 
+        """
         score = 0
         document_length = sum(self.documents[document_id].values())
         for key, value in query[2].items():
