@@ -10,6 +10,9 @@ RE             :Regular expressions
 Stemming       :https://pypi.python.org/pypi/stemming/1.0
 _pickle        :Python 3.5 <built_in>
 argparse       :conda install -c anaconda argparse=1.3.0
+numpy          :conda install -c anaconda numpy=1.12.1 
+scipy          :conda install -c anaconda scipy=0.19.0
+scikit-learn   :conda install scikit-learn
 ```
 ```
 Running the code:
