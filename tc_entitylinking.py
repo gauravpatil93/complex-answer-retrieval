@@ -2,72 +2,169 @@
 @author: Shilpa Dhagat.
 
 """
+from trec_car.read_data import *
+from nltk.corpus import stopwords
+import re
+from stemming.porter2 import stem
+import tagme
 
-import argparse
-from tc_interpret_entitylinking import InterpretEntityLinking
-
-
-class GIF(object):
-    """
-    Attributes:
-        score_th: score threshold
-        query_annots: candidate entity ranking annotations for a query.
-    """
-
-    def __init__(self, query_annot):
-        self.score_th = 2
-        self.query_annot = query_annot
-
-    def process_query(self):
-        """
-        Processes the query annotations and generates the interpretation sets.
-
-        """
-
-        interprets = self.form_interprets()
-        return interprets
-
-    def form_interprets(self):
-            """
-            Forms query interpretations from the given annotations.
-            :return list of query interpretations [{men1: en1, ..}, ..]
-            """
-            query_interpret = [{}]
-            for mention, entity in self.query_annot:
-                    added = False
-                    for interpret in query_interpret:
-                            mentions = interpret.keys()
-                            mentions.append(mention)
-                            if not self.__is_overlapping(mentions):
-                                    interpret[mention] = entity
-                                    added = True
-                    if not added:
-                            query_interpret.append({mention: entity})
-            return query_interpret
+GCUBE_TOKEN = "bfbfb535-3683-47c0-bd11-df06d5d96726-843339462"
+DEFAULT_LANG = "en"
+DEFAULT_TAG_API = "https://tagme.d4science.org/tagme/tag"
+DEFAULT_SPOT_API = "https://tagme.d4science.org/tagme/spot"
+DEFAULT_REL_API = "https://tagme.d4science.org/tagme/rel"
 
 
-def main():
-        parser = argparse.ArgumentParser()
-        parser.add_argument("outline_file", type=str, help="Qualified location of the outline file")
-        parser.add_argument("paragraph_file", type=str, help="Qualified location of the paragraph file")
-        parser.add_argument("output_file", type=str, help="Name of the output file")
-        parser.add_argument("-th", "--threshold", help="Score threshold for greedy approach", default=None, type=float)
-        args = vars(parser.parse_args())
+class EntityLinkingRanking:
 
-        query_cbor = args['outline_file']
-        paragraphs_cbor = args['paragraph_file']
-        output_file_name = args['output_file']
-        threshhold = 20
+    stop_words = stopwords.words('english')
 
-        ranking = InterpretEntityLinking(query_cbor, paragraphs_cbor, output_file_name)
+    def __init__(self, outline_file, paragraph_file, output_file):
+        self.outline_file = outline_file
+        self.paragraph_file = paragraph_file
+        self.output_file = output_file
+        self.pages = self.gather_pages()
+        self.queries = self.gather_queries()
+        self.paragraphs = self.gather_paragraphs()
+        self.enhanced_queries = self.gather_entity_enhanced_queries_mentions()
+        self.enhanced_paragraphs = self.gather_entity_enhanced_paragraphs_mentions()
 
-        query_annotations = ranking.gather_entity_enhanced_queries_annotations()
-        #print(query_annotations)
-        interprets = {}
-        for query_annot in query_annotations:
-                print(query_annot)
-                interprets[query_annot] = GIF(query_annot).process_query()
+    def gather_pages(self):
+        with open(self.outline_file, 'rb') as f:
+            pages = [p for p in itertools.islice(iter_annotations(f), 0, 1000)]
+        return pages
 
+    def gather_paragraphs(self):
+        id_to_text_dict = dict()
+        with open(self.paragraph_file, 'rb') as f:
+            for p in itertools.islice(iter_paragraphs(f), 0, 4000):
+                id_to_text_dict[p.para_id] = EntityLinkingRanking.process_text(p.get_text())
+        return id_to_text_dict
 
-if __name__ == "__main__":
-    main()
+    @staticmethod
+    def process_text(input_text: str):
+        # Convert characters to lower case
+        input_text_to_lower = input_text.lower()
+        # Remove special characters from the string
+        input_text_to_lower = re.sub('[^a-zA-Z0-9 \n]', '', input_text_to_lower)
+        # Remove common words using list of stop words
+        filtered_words_list = [word for word in input_text_to_lower.split() if word not in EntityLinkingRanking.stop_words]
+        # Stem the list of words
+        filtered_words_list = [stem(word) for word in filtered_words_list]
+        # Word ranking
+        ranked_dict = dict()
+        for word in filtered_words_list:
+            if word in ranked_dict:
+                ranked_dict[word] += 1
+            else:
+                ranked_dict[word] = 1
+        return ranked_dict
+
+    def gather_queries(self):
+        query_tup_list = []
+        for page in self.pages:
+            for section_path in page.flat_headings_list():
+                query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
+                query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
+                tup = (query_id_plain, query_id_formatted, EntityLinkingRanking.process_text(query_id_plain))
+                query_tup_list.append(tup)
+                print(tup)
+        return query_tup_list
+
+    @staticmethod
+    def process_text_append_text_mentions(input_text: str):
+        # Find spots in a text
+        mentions = tagme.mentions(input_text, GCUBE_TOKEN)
+        entities = " ".join([word.mention for word in mentions.get_mentions(0.01)])
+        # Convert characters to lower case
+        input_text_to_lower = (input_text + " " + entities).lower()
+        # Remove special characters from the string
+        input_text_to_lower = re.sub('[^a-zA-Z0-9 \n]', '', input_text_to_lower)
+        # Remove common words using list of stop words
+        filtered_words_list = [word for word in input_text_to_lower.split() if word not in EntityLinkingRanking.stop_words]
+        # Stem the list of words
+        filtered_words_list = [stem(word) for word in filtered_words_list]
+        # Word ranking
+        ranked_dict = dict()
+        for word in filtered_words_list:
+            if word in ranked_dict:
+                ranked_dict[word] += 1
+            else:
+                ranked_dict[word] = 1
+        return ranked_dict
+
+    @staticmethod
+    def process_text_append_text_annotations(input_text: str):
+        # Find annotations in a text
+        annotations = tagme.annotate(input_text, GCUBE_TOKEN)
+        entities = " ".join([word.entity_title for word in annotations.get_annotations(0.2)])
+        # Convert characters to lower case
+        input_text_to_lower = (input_text + " " + entities).lower()
+        # Remove special characters from the string
+        input_text_to_lower = re.sub('[^a-zA-Z0-9 \n]', '', input_text_to_lower)
+        # Remove common words using list of stop words
+        filtered_words_list = [word for word in input_text_to_lower.split() if word not in EntityLinkingRanking.stop_words]
+        # Stem the list of words
+        filtered_words_list = [stem(word) for word in filtered_words_list]
+        # Word ranking
+        ranked_dict = dict()
+        for word in filtered_words_list:
+            if word in ranked_dict:
+                ranked_dict[word] += 1
+            else:
+                ranked_dict[word] = 1
+        return ranked_dict
+
+    def gather_entity_enhanced_queries_mentions(self):
+        query_tup_list = []
+        for page in self.pages:
+            for section_path in page.flat_headings_list():
+                query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
+                query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
+                enhance_query_list = EntityLinkingRanking.process_text_append_text_mentions(query_id_plain)
+                tup = (query_id_plain, query_id_formatted, enhance_query_list)
+                # print(Ranking.process_text_append_text_mentions(query_id_plain))
+                print(tup)
+                query_tup_list.append(tup)
+        return query_tup_list
+
+    def gather_entity_enhanced_paragraphs_mentions(self):
+        id_to_text_dict = dict()
+        with open(self.paragraph_file, 'rb') as f:
+            for p in itertools.islice(iter_paragraphs(f), 0, 4000):
+                id_to_text_dict[p.para_id] = EntityLinkingRanking.process_text_append_text_mentions(p.get_text())
+                print(id_to_text_dict[p.para_id])
+        return id_to_text_dict
+
+    def gather_entity_enhanced_queries_annotations(self):
+        query_tup_list = []
+        for page in self.pages:
+            for section_path in page.flat_headings_list():
+                query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
+                query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
+                enhance_query_list = EntityLinkingRanking.process_text_append_text_annotations(query_id_plain)
+                tup = (query_id_plain, query_id_formatted, enhance_query_list )
+                # print(tup)
+                query_tup_list.append(tup)
+        return query_tup_list
+
+    def gather_entity_enhanced_paragraphs_annotations(self):
+        id_to_text_dict = dict()
+        with open(self.paragraph_file, 'rb') as f:
+            for p in itertools.islice(iter_paragraphs(f), 0, 4000):
+                id_to_text_dict[p.para_id] = EntityLinkingRanking.process_text_append_text_annotations(p.get_text())
+                # print(id_to_text_dict[p.para_id])
+        return id_to_text_dict
+
+    def get_queries(self):
+        return self.queries
+
+    def get_paragraphs(self):
+        return self.paragraphs
+
+    def get_enhanced_queries(self):
+        return self.enhanced_queries
+
+    def get_enhanced_paragraphs(self):
+        return self.enhanced_paragraphs
+
