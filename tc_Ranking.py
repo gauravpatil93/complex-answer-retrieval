@@ -17,12 +17,13 @@ class Ranking:
     stop_words = stopwords.words('english')
     cache_words = dict()
 
-    def __init__(self, outline_file, paragraph_file, enable_cache=False):
+    def __init__(self, outline_file, paragraph_file, no_passages_to_extract, enable_cache=False):
         """
         Constructor
         :param outline_file: path of the outline file
         :param paragraph_file: path of the paragraph file
         """
+        self.passages_extract = no_passages_to_extract
         self.outline_file = outline_file
         self.paragraph_file = paragraph_file
         self.enable_cache = enable_cache
@@ -46,10 +47,10 @@ class Ranking:
         """
         id_to_text_dict = dict()
         with open(self.paragraph_file, 'rb') as f:
-            for p in itertools.islice(iter_paragraphs(f), 0, 1000, 5):
+            for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query(p.get_text())
         if self.enable_cache is True:
-            _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "_cache/paragraph_structure"), "wb"))
+            _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "cache/paragraph_structure"), "wb"))
         return id_to_text_dict
 
     @staticmethod
@@ -89,7 +90,7 @@ class Ranking:
                 tup = (query_id_plain, query_id_formatted, Ranking.process_text_query(query_id_plain))
                 query_tup_list.append(tup)
         if self.enable_cache is True:
-            _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "_cache/query_structure_cache"), "wb"))
+            _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/query_structure_cache"), "wb"))
         return query_tup_list
 
     def get_queries(self):
