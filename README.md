@@ -11,3 +11,37 @@ Stemming       :https://pypi.python.org/pypi/stemming/1.0
 _pickle        :Python 3.5 <built_in>
 argparse       :conda install -c anaconda argparse=1.3.0
 ```
+```
+Running the code:
+
+The code implements 4 types of ranking functions BM25, BM25+, TFIDF(Delta), DIRICHLET
+
+Caching mechanism implemented for TFIDF(Delta) and DIRICHLET SMOOTHING METHODS so once the cache is generated it can used for both of these methods.
+
+If running tests on TFIDF(Delta) and DIRICHLET
+```
+# Generating Cache
+```
+tc_generate_document_cache.py [outlines file] [paragraphs file] [no of passages to extracts from pagagraph file]
+```
+
+# Generating trec_eval compatible results file
+```
+tc_generate_document.py [outlines file] [paragraphs file] [output file] [ranking function] [cache] [no of passages to extract]
+
+The aforementoned arguments can take the following value:
+
+[ranking function]          : BM25, BM25+, TFIDFIMPROVED, DIRICHLET
+[cache]                     : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
+[no of passages to extract] : an integer
+```
+
+# NOTE
+```
+Important note about caching. cPickle has limitations to the amount of data that it can serizalize and store so after running a test on 7 million passages trying to cache them proved that indexes of such a large data set cannot be cached
+
+For the next iteration a pure pythonic full text indexing library can be used such as 
+https://pypi.python.org/pypi/Whoosh/
+or an alternative to this would be to serialize and store the data in a relational or no-sql database.
+```
+#
