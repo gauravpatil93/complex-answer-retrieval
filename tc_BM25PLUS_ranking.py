@@ -1,5 +1,10 @@
 import math
 
+"""
+BM25+
+
+@author: Gaurav Patil.
+"""
 
 class BM25PLUS:
 
@@ -41,7 +46,7 @@ class BM25PLUS:
         else:
             return 0
 
-    def bm25_score(self, query, document_id):
+    def score(self, query, document_id):
         score = 0
         document_length = sum(self.documents[document_id].values())
         for key, value in query[2].items():

@@ -1,6 +1,9 @@
 import math
 
-
+"""
+Basic BM25
+@author: Gaurav Patil
+"""
 class BM25:
 
     def __init__(self, query_structure, document_structure):
@@ -16,6 +19,7 @@ class BM25:
         self.k = 1.2
         self.b = 0.75
         self.k_plus_one = self.k + 1
+        self.cache = dict()
 
     def average_length_of_documents(self):
         """
@@ -29,23 +33,49 @@ class BM25:
         return summ/float(self.no_of_documents)
 
     def inverse_document_frequency(self, query_word):
+        """
+        Takes the query term and returns the inverse document for a query term
+        :param query_word: string
+        :return: float: idf value
+        """
         no_qi = self.no_of_documents_containing_a_word(query_word)
         return float(math.log(self.no_of_documents / (no_qi + 1.0)))
 
     def no_of_documents_containing_a_word(self, query_word):
-        count = 0
-        for key, value in self.documents.items():
-            if query_word in value:
-                count += 1
-        return float(count)
+        """
+        Given a query term returns the no of documents containing the word
+        :param query_word: 
+        :return: 
+        """
+        if query_word in self.cache:
+            return float(self.cache[query_word])
+        else:
+            no_of_documents_having_the_word = 0
+            for para_id, ranked_word_dict in self.documents.items():
+                if query_word in ranked_word_dict:
+                    no_of_documents_having_the_word += 1
+            self.cache[query_word] = no_of_documents_having_the_word
+            return float(no_of_documents_having_the_word)
 
     def word_frequency_of_word_in_document(self, word, document_id):
+        """
+        Finds the frequency of a word in the document
+        :param word: string
+        :param document_id: string
+        :return: int occurrence of the word
+        """
         if word in self.documents[document_id]:
             return self.documents[document_id][word]
         else:
             return 0
 
-    def bm25_score(self, query, document_id):
+    def score(self, query, document_id):
+        """
+        Given a query and a document calculates the score
+        :param query: tuple
+        :param document_id: string
+        :return: tuple (formatted_query, document_id, score) 
+        """
         score = 0
         document_length = 0
         for k, v in self.documents[document_id].items():
@@ -53,7 +83,7 @@ class BM25:
         for key, value in query[2].items():
             term_freq = self.word_frequency_of_word_in_document(key, document_id)
             score += self.inverse_document_frequency(key) * (self.k_plus_one * term_freq) / \
-                     (self.k * (1.0 - self.b + self.b * (document_length/ self.average_length_of_all_documents))
-                      + term_freq )
+                     (self.k * (1.0 - self.b + self.b * (document_length / self.average_length_of_all_documents))
+                      + term_freq)
         tup = (query[1], document_id, score)
         return tup

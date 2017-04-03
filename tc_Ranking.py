@@ -1,7 +1,15 @@
-from trec_car.read_data import *
-from nltk.corpus import stopwords
+import _pickle
+import os
 import re
+
+from nltk.corpus import stopwords
 from stemming.porter2 import stem
+from trec_car.read_data import *
+
+"""
+This class contains methods that generate the structure that is used by the ranking functions.
+@author: Gaurav Patil.
+"""
 
 
 class Ranking:
@@ -9,16 +17,15 @@ class Ranking:
     stop_words = stopwords.words('english')
     cache_words = dict()
 
-    def __init__(self, outline_file, paragraph_file, output_file):
+    def __init__(self, outline_file, paragraph_file, enable_cache=False):
         """
         Constructor
         :param outline_file: path of the outline file
         :param paragraph_file: path of the paragraph file
-        :param output_file: path of the output file
         """
         self.outline_file = outline_file
         self.paragraph_file = paragraph_file
-        self.output_file = output_file
+        self.enable_cache = enable_cache
         self.pages = self.gather_pages()
         self.queries = self.gather_queries()
         self.paragraphs = self.gather_paragraphs()
@@ -41,6 +48,8 @@ class Ranking:
         with open(self.paragraph_file, 'rb') as f:
             for p in itertools.islice(iter_paragraphs(f), 0, 1000, 5):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query(p.get_text())
+        if self.enable_cache is True:
+            _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "_cache/paragraph_structure"), "wb"))
         return id_to_text_dict
 
     @staticmethod
@@ -79,6 +88,8 @@ class Ranking:
                 query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
                 tup = (query_id_plain, query_id_formatted, Ranking.process_text_query(query_id_plain))
                 query_tup_list.append(tup)
+        if self.enable_cache is True:
+            _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "_cache/query_structure_cache"), "wb"))
         return query_tup_list
 
     def get_queries(self):
