@@ -43,10 +43,6 @@ just run the following command
 
 tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run DIRICHLET cache 50000
 tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run TFIDFIMPROVED cache 50000
-
-Following are the links to download the already generated files using the above steps:
-
-
 ```
 
 # NOTE
@@ -64,9 +60,24 @@ eval framework from trec_car
 
 eval_framework.py [qrels] [run]
 ```
-# sample clustering implementation
+# Sample Clustering Implementation
   in folder trec_cluster_basic run the run.sh script 
   
 # Results 
+
+```
+DIRICHLETS SMOOTHING ALGORITHM
+
+using test 200's hierarchichal qrel file and 1,000,000 passages from release1.4.v
+
+map - 0.1423
+r-prec - 0.1311
+
+using test 200's hierarchichal qrel file and 4000 passages from training data
+
+map - 0.2782
+r-prec - 0.2303
+
+```
 
 
