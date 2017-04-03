@@ -34,6 +34,16 @@ The aforementoned arguments can take the following value:
 [ranking function]          : BM25, BM25+, TFIDFIMPROVED, DIRICHLET
 [cache]                     : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
 [no of passages to extract] : an integer
+
+For first run: The repo already includes a cached collection of 50,000 passages so to test either TFIDF(Delta) or DIRICHLET
+just run the following command 
+
+tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run DIRICHLET cache 50000
+tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run TFIDFIMPROVED cache 50000
+
+Following are the links to download the already generated files using the above steps:
+
+
 ```
 
 # NOTE
@@ -44,4 +54,14 @@ For the next iteration a pure pythonic full text indexing library can be used su
 https://pypi.python.org/pypi/Whoosh/
 or an alternative to this would be to serialize and store the data in a relational or no-sql database.
 ```
-#
+# Calculating Results
+
+```
+eval framework from trec_car 
+
+eval_framework.py [qrels] [run]
+```
+
+# Results 
+
+
