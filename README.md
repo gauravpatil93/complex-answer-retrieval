@@ -80,4 +80,8 @@ r-prec - 0.2303
 
 ```
 
+# Contributions
 
+Gaurav Patil: BM25, BM25+, DIRICHLETS, TFIDF Improved, Text Processing Algorithms and Cachcing 
+Colin Etzel : Implmented clustering 
+Shilpa Dhagat:
