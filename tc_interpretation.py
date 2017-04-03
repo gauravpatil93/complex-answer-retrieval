@@ -9,8 +9,7 @@ from tc_interpret_entitylinking import InterpretEntityLinking
 
 class GIF(object):
     """
-    Attributes:
-        score_th: score threshold
+ 
         query_annots: candidate entity ranking annotations for a query.
     """
 
@@ -20,7 +19,9 @@ class GIF(object):
 
     def process_query(self):
         """
-        Processes the query annotations and generates the interpretation sets.
+        Processesing w.r.t scores is not required since it is already been filtered in the tagme.annotate method.
+        Score for all the annotations > 0.2
+        Takes query annotations and generates the interpretation sets.
 
         """
 
@@ -30,7 +31,7 @@ class GIF(object):
     def form_interprets(self):
             """
             Forms query interpretations from the given annotations.
-            :return list of query interpretations [{men1: en1, ..}, ..]
+            :returns list of query interpretations [{men1: en1, ..}, ..]
             """
             query_interpret = [{}]
             for mention, entity in self.query_annot:
