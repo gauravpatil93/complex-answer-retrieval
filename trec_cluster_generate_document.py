@@ -1,7 +1,7 @@
 import argparse
 from copy import deepcopy
 from trec_car.format_runs import *
-from trec_cluster_Ranking import Ranking
+from tc_ranking import Ranking
 from tc_BM25_ranking import BM25
 from tc_BM25PLUS_ranking import BM25PLUS
 from tc_TFIDF_IMPROVED import TDELTAIDF
@@ -20,7 +20,7 @@ output_file_name = args['output_file']
 
 ranking = Ranking(query_cbor, paragraphs_cbor, output_file_name)
 
-query_structure = ranking.gather_queries()
+query_structure = ranking.gather_queries_and_page()
 document_structure = ranking.gather_paragraphs()
 docDict = ranking.gather_paragraphs_plain()
 
@@ -71,24 +71,7 @@ for key in pageMap.keys():
 # Write the results to a file
 print("Writing output to file...............................................\n")
 
-"""
-output code for only gaurav's code
-with open(output_file_name, mode='w', encoding='UTF-8') as f:
-    writer = f
-    temp_list = []
-    count = 0
-    for k3, value in query_scores.items():
-        count += 1
-        rank = 0
-        for x in value:
-            rank += 1
-            temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-    format_run(writer, temp_list, exp_name='test')
-    f.close()
-"""
-
-
-#need to format with respect to above
+#need to format to output a .run file instead
 for ranking in clusterRankings:
     print(ranking)
     print("\n")
