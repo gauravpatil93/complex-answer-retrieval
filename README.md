@@ -27,7 +27,7 @@ If running tests on TFIDF(Delta) and DIRICHLET
 ```
 # Generating Cache
 ```
-tc_generate_document_cache.py [outlines file] [paragraphs file] [no of passages to extracts from pagagraph file]
+tc_generate_document_cache.py [outlines file] [paragraphs file] [no of passages to extracts from paragraph file]
 ```
 
 # Generating trec_eval compatible results file
