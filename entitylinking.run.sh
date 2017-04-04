@@ -10,4 +10,4 @@ echo "============================================================="
 echo "Running evaluation framework on results with entity linking  "
 echo "============================================================="
 
-python eval_framework.py $1 $2
+python eval_framework.py $4 $5
