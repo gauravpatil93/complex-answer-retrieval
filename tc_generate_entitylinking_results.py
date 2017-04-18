@@ -46,7 +46,7 @@ if use_entity_linking == "enhanced":
         temp_list = []
         print(queries_parsed)
         for key, value in document_structure.items():
-            temp_list.append(bm25_instance.t_delta_score(query, key))
+            temp_list.append(bm25_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
         query_scores[query[1]] = deepcopy(temp_list)
