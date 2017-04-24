@@ -13,130 +13,91 @@ from tc_TFIDF_IMPROVED import TDELTAIDF
 
 """
 @author: Gaurav Patil.
-This program is the implementation of the re-ranking the top n retrieved.
 """
 
 parser = argparse.ArgumentParser()
 parser.add_argument("outline_file", type=str, help="Qualified location of the outline file")
 parser.add_argument("paragraph_file", type=str, help="Qualified location of the paragraph file")
 parser.add_argument("output_file", type=str, help="Name of the output file")
-parser.add_argument("primary_retrieval_algorithm", type=str, help="BM25, BM25+, TFIDFIMPROVED, DIRICHLET")
-parser.add_argument("re-ranking_algorithm", type=str, help="BM25, BM25+, TFIDFIMPROVED, DIRICHLET")
+parser.add_argument("ranking_function", type=str, help="BM25, BM25+, TFIDFIMPROVED")
 parser.add_argument("use_cache", type=str, help="cache, no_cache")
-parser.add_argument("no_of_results_to_re-rank", type=int, help="Select how many to re-rank")
+parser.add_argument("only_top_n", type=int, help="Select top_n results")
 parser.add_argument("passages_extract", type=int, help="no of passages to extract")
 args = vars(parser.parse_args())
 
 query_cbor = args['outline_file']
 paragraphs_cbor = args['paragraph_file']
 output_file_name = args['output_file']
+algorithm = args['ranking_function']
 cache_flag = args['use_cache']
-primary_retrieval_algorithm = args["primary_retrieval_algorithm"]
-reranking_algorithm = args["re-ranking_algorithm"]
-rerank_n = args["no_of_results_to_re-rank"]
-passages_extract = args["passages_extract"]
+top_n = args["only_top_n"]
+passages_extract = args['passages_extract']
 
-if passages_extract < rerank_n:
+if passages_extract < top_n:
     print("The no of passages extracted should be greater than the number of results to be re-ranked")
     exit()
 
 query_structure = None
 document_structure = None
-primary = None
-re_rank = None
+logic_instance = None
 
-
-#
-#
-#
-# If the algorithms are BM25 and DIRICHLET
-#
-#
-#
-if primary_retrieval_algorithm == "BM25" and reranking_algorithm == "DIRICHLET":
+if algorithm == 'BM25':
     if cache_flag == 'cache':
         BM25.useCache = True
         query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
         document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
         print("No of queries" + str(len(query_structure)))
         print("No of documents" + str(len(document_structure)))
-        BM25.average_doc_length = _pickle.load(
-            open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
-        BM25.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
-        primary = BM25(query_structure, document_structure)
-
-        DIRICHLET.useCache = True
-        DIRICHLET.number_of_words_in_the_collection_s = \
+        BM25.number_of_words_in_the_collection_s = \
             _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
-        DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
+        BM25.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
+        logic_instance = BM25(query_structure, document_structure)
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
         query_structure = ranking.gather_queries()
         document_structure = ranking.gather_paragraphs()
-        primary = BM25(query_structure, document_structure)
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
-#
-#
-#
-# If the algorithms are BM25+ and DIRICHLET
-#
-#
-#
-elif primary_retrieval_algorithm == "BM25+" and reranking_algorithm == "DIRICHLET":
+        print("No of queries" + str(len(query_structure)))
+        print("No of documents" + str(len(document_structure)))
+        logic_instance = BM25(query_structure, document_structure)
+
+
+elif algorithm == 'BM25+':
     if cache_flag == 'cache':
         BM25PLUS.useCache = True
         query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
         document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
         print("No of queries" + str(len(query_structure)))
         print("No of documents" + str(len(document_structure)))
-        BM25PLUS.average_doc_length = _pickle.load(
-            open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
-        BM25PLUS.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
-        primary = BM25PLUS(query_structure, document_structure)
-
-        DIRICHLET.useCache = True
-        DIRICHLET.number_of_words_in_the_collection_s = \
+        BM25PLUS.number_of_words_in_the_collection_s = \
             _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
-        DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
+        BM25PLUS.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
+        logic_instance = DIRICHLET(query_structure, document_structure, 2500)
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
         query_structure = ranking.gather_queries()
         document_structure = ranking.gather_paragraphs()
-        primary = BM25PLUS(query_structure, document_structure)
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
-#
-#
-#
-# If the algorithms are TFIDFIMPORVED and DIRICHLET
-#
-#
-#
-elif primary_retrieval_algorithm == "TFIDFIMPROVED" and reranking_algorithm == "DIRICHLET":
+        print("No of queries" + str(len(query_structure)))
+        print("No of documents" + str(len(document_structure)))
+        logic_instance = BM25PLUS(query_structure, document_structure)
+
+elif algorithm == 'TFIDFIMPROVED':
+    logic_instance = None
     if cache_flag == 'cache':
         TDELTAIDF.useCache = True
         query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
         document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
         print("No of queries" + str(len(query_structure)))
         print("No of documents" + str(len(document_structure)))
-        TDELTAIDF.average_doc_length = _pickle.load(
-            open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
+        TDELTAIDF.average_doc_length = _pickle.load(open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
         TDELTAIDF.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
-        primary = TDELTAIDF(query_structure, document_structure)
-
-        DIRICHLET.useCache = True
-        DIRICHLET.number_of_words_in_the_collection_s = \
-            _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
-        DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
+        logic_instance = TDELTAIDF(query_structure, document_structure)
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
         query_structure = ranking.gather_queries()
         document_structure = ranking.gather_paragraphs()
-        primary = TDELTAIDF(query_structure, document_structure)
-        re_rank = DIRICHLET(query_structure, document_structure, 2500)
-
+        print("No of queries" + str(len(query_structure)))
+        print("No of documents" + str(len(document_structure)))
+        logic_instance = TDELTAIDF(query_structure, document_structure)
 
 # Generate the query scores
 print("Generating the output structure by calculating scores................\n")
@@ -147,13 +108,11 @@ for query in query_structure:
     top_n_list = []
     print(queries_parsed)
     for key, value in document_structure.items():
-        temp_list.append(primary.score(query, key))
+        temp_list.append(logic_instance.score(query, key))
     temp_list.sort(key=lambda m: m[2])
     temp_list.reverse()
-    for elements in temp_list[:rerank_n]:
-        top_n_list.append(re_rank.score(elements[0], elements[1]))
-    top_n_list.sort(key=lambda m: m[2])
-    top_n_list.reverse()
+    for elem in temp_list[:top_n]:
+        top_n_list.append((elem[0][1], elem[1], elem[2]))
     query_scores[query[1]] = deepcopy(top_n_list)
     queries_parsed += 1
 
