@@ -60,7 +60,7 @@ class Ranking:
         """
         id_to_text_dict = dict()
         with open(self.paragraph_file, 'rb') as f:
-            for p in itertools.islice(iter_paragraphs(f), 0, 1000, 5):
+            for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query_plain(p.get_text())
         return id_to_text_dict
         
