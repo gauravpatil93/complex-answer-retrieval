@@ -32,23 +32,24 @@ parser.add_argument("outline_file", type=str, help="Qualified location of the ou
 parser.add_argument("paragraph_file", type=str, help="Qualified location of the paragraph file")
 parser.add_argument("output_file", type=str, help="Name of the output file")
 parser.add_argument("ranking_function", type=str, help="BM25, BM25+, TFIDFIMPROVED, DIRICHLET")
-parser.add_argument("use_cache", type=str, help="cache, no_cache")
+parser.add_argument("number of clusters", type=int, help="Number of extra clusters for kmeans step")
 parser.add_argument("passages_extract",type=int, help="no of passages to extract")
 args = vars(parser.parse_args())
 
+num_clusters = 0
 query_cbor = args['outline_file']
 paragraphs_cbor = args['paragraph_file']
 output_file_name = args['output_file']
 algorithm = args['ranking_function']
-cache_flag = args['use_cache']
 passages_extract = args['passages_extract']
+num_clusters = args['number of clusters']
 
 if algorithm == 'BM25':
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
     query_structure = ranking.gather_queries()
     document_structure = ranking.gather_paragraphs()
-    document_texts = ranking.gather_paragraphs_plain()
     logic_instance = BM25(query_structure, document_structure)
+    document_texts = ranking.gather_paragraphs_plain()
     page_structure = ranking.gather_pages()
 
     print("No of queries" + str(len(query_structure)))
@@ -99,7 +100,7 @@ if algorithm == 'BM25':
                 paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
         data.append(list(paragraphs))
         data.append(collection[3])
-        rankings = cluster_kmeans.runKMeansPipeline(data)
+        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
         print("Writing one page output to file...............................................\n")
 
         with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
@@ -110,41 +111,35 @@ if algorithm == 'BM25':
                     temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
             format_run(writer, temp_list, exp_name='test')
             f.close()
-        writeMode = "a"
+        writeMode = "a" #all further writes to append to file
         
-
-   
-    """
-    mode = "w" #first write will overwrite old file, changes to appending after the first iteration
-    for sectionIDs in queryCollections:
-        results = []
-        print(sectionIDs)
-        for queryId in sectionIDs:
-            pass
-    """
-    # Write the results to a file
-    """
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
-    """
 elif algorithm == 'BM25+':
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
     query_structure = ranking.gather_queries()
     document_structure = ranking.gather_paragraphs()
     logic_instance = BM25PLUS(query_structure, document_structure)
+    document_texts = ranking.gather_paragraphs_plain()
+    page_structure = ranking.gather_pages()
 
     print("No of queries" + str(len(query_structure)))
     print("No of documents" + str(len(document_structure)))
+
+    #generate query names for each page
+    queryCollections = list()
+    for pageobj in page_structure:
+        mypageid = pageobj.page_id #formatted pageid
+        mypagename = pageobj.page_name #plaintext pagename
+        sectionIds = list()
+        sectionNames = list()
+        for section in pageobj.flat_headings_list():
+            sectionpath = mypageid + "/"
+            sectionphrase = mypagename + " "
+            for child in section:
+                sectionpath += child.headingId + "/"
+                sectionphrase += child.heading + " "
+            sectionIds.append(sectionpath[0:-1]) #clip off the last "/"
+            sectionNames.append(sectionphrase[0:-1]) #clip off the last space
+        queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
     # Generate the query scores
     print("Generating the output structure by calculating scores................\n")
@@ -160,38 +155,60 @@ elif algorithm == 'BM25+':
         query_scores[query[1]] = deepcopy(temp_list)
         queries_parsed += 1
 
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
+    writeMode = "w" #first write of clustering output not appending
+
+    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
+    for collection in queryCollections:
+        data = list()
+        data.append(collection[1])
+        data.append(collection[2])
+        paragraphs = set()
+        for queryid in collection[3]:
+            for scoretup in query_scores[queryid]:
+                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
+        data.append(list(paragraphs))
+        data.append(collection[3])
+        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
+        print("Writing one page output to file...............................................\n")
+
+        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
+            writer = f
+            temp_list = []
+            for rankingsList in rankings:
+                for ranking in rankingsList:
+                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
+            format_run(writer, temp_list, exp_name='test')
+            f.close()
+        writeMode = "a" #all further writes to append to file
 
 elif algorithm == 'TFIDFIMPROVED':
-    logic_instance = None
-    if cache_flag == 'cache':
-        TDELTAIDF.useCache = True
-        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
-        document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
-        TDELTAIDF.average_doc_length = _pickle.load(open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
-        TDELTAIDF.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
-        logic_instance = TDELTAIDF(query_structure, document_structure)
-    else:
-        ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-        query_structure = ranking.gather_queries()
-        document_structure = ranking.gather_paragraphs()
-        logic_instance = TDELTAIDF(query_structure, document_structure)
+
+    ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
+    query_structure = ranking.gather_queries()
+    document_structure = ranking.gather_paragraphs()
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    document_texts = ranking.gather_paragraphs_plain()
+    page_structure = ranking.gather_pages()
 
     print("No of queries" + str(len(query_structure)))
     print("No of documents" + str(len(document_structure)))
+
+    #generate query names for each page
+    queryCollections = list()
+    for pageobj in page_structure:
+        mypageid = pageobj.page_id #formatted pageid
+        mypagename = pageobj.page_name #plaintext pagename
+        sectionIds = list()
+        sectionNames = list()
+        for section in pageobj.flat_headings_list():
+            sectionpath = mypageid + "/"
+            sectionphrase = mypagename + " "
+            for child in section:
+                sectionpath += child.headingId + "/"
+                sectionphrase += child.heading + " "
+            sectionIds.append(sectionpath[0:-1]) #clip off the last "/"
+            sectionNames.append(sectionphrase[0:-1]) #clip off the last space
+        queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
     # Generate the query scores
     print("Generating the output structure by calculating scores................\n")
@@ -207,38 +224,60 @@ elif algorithm == 'TFIDFIMPROVED':
         query_scores[query[1]] = deepcopy(temp_list)
         queries_parsed += 1
 
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
+    writeMode = "w" #first write of clustering output not appending
+
+    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
+    for collection in queryCollections:
+        data = list()
+        data.append(collection[1])
+        data.append(collection[2])
+        paragraphs = set()
+        for queryid in collection[3]:
+            for scoretup in query_scores[queryid]:
+                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
+        data.append(list(paragraphs))
+        data.append(collection[3])
+        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
+        print("Writing one page output to file...............................................\n")
+
+        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
+            writer = f
+            temp_list = []
+            for rankingsList in rankings:
+                for ranking in rankingsList:
+                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
+            format_run(writer, temp_list, exp_name='test')
+            f.close()
+        writeMode = "a" #all further writes to append to file
 
 elif algorithm == 'DIRICHLET':
-    if cache_flag == 'cache':
-        DIRICHLET.useCache = True
-        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
-        document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
-        DIRICHLET.number_of_words_in_the_collection_s = \
-            _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
-        DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        logic_instance = DIRICHLET(query_structure, document_structure, 2500)
-    else:
-        ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-        query_structure = ranking.gather_queries()
-        document_structure = ranking.gather_paragraphs()
-        logic_instance = DIRICHLET(query_structure, document_structure, 2500)
+
+    ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
+    query_structure = ranking.gather_queries()
+    document_structure = ranking.gather_paragraphs()
+    logic_instance = DIRICHLET(query_structure, document_structure, 2500)
+    document_texts = ranking.gather_paragraphs_plain()
+    page_structure = ranking.gather_pages()
 
     print("No of queries" + str(len(query_structure)))
     print("No of documents" + str(len(document_structure)))
+
+    #generate query names for each page
+    queryCollections = list()
+    for pageobj in page_structure:
+        mypageid = pageobj.page_id #formatted pageid
+        mypagename = pageobj.page_name #plaintext pagename
+        sectionIds = list()
+        sectionNames = list()
+        for section in pageobj.flat_headings_list():
+            sectionpath = mypageid + "/"
+            sectionphrase = mypagename + " "
+            for child in section:
+                sectionpath += child.headingId + "/"
+                sectionphrase += child.heading + " "
+            sectionIds.append(sectionpath[0:-1]) #clip off the last "/"
+            sectionNames.append(sectionphrase[0:-1]) #clip off the last space
+        queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
     # Generate the query scores
     print("Generating the output structure by calculating scores................\n")
@@ -254,20 +293,31 @@ elif algorithm == 'DIRICHLET':
         query_scores[query[1]] = deepcopy(temp_list)
         queries_parsed += 1
 
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
+    writeMode = "w" #first write of clustering output not appending
+
+    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
+    for collection in queryCollections:
+        data = list()
+        data.append(collection[1])
+        data.append(collection[2])
+        paragraphs = set()
+        for queryid in collection[3]:
+            for scoretup in query_scores[queryid]:
+                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
+        data.append(list(paragraphs))
+        data.append(collection[3])
+        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
+        print("Writing one page output to file...............................................\n")
+
+        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
+            writer = f
+            temp_list = []
+            for rankingsList in rankings:
+                for ranking in rankingsList:
+                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
+            format_run(writer, temp_list, exp_name='test')
+            f.close()
+        writeMode = "a" #all further writes to append to file
 
 else:
     print("Invalid ranking function")
