@@ -34,6 +34,7 @@ parser.add_argument("output_file", type=str, help="Name of the output file")
 parser.add_argument("ranking_function", type=str, help="BM25, BM25+, TFIDFIMPROVED, DIRICHLET")
 parser.add_argument("number of clusters", type=int, help="Number of extra clusters for kmeans step")
 parser.add_argument("passages_extract",type=int, help="no of passages to extract")
+parser.add_argument("passages per section", type=int, help="number of passages per section")
 args = vars(parser.parse_args())
 
 num_clusters = 0
@@ -43,6 +44,7 @@ output_file_name = args['output_file']
 algorithm = args['ranking_function']
 passages_extract = args['passages_extract']
 num_clusters = args['number of clusters']
+passages_per_section = args['passages per section']
 
 if algorithm == 'BM25':
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
@@ -84,7 +86,7 @@ if algorithm == 'BM25':
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
+        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
         queries_parsed += 1
 
     writeMode = "w" #first write of clustering output not appending
@@ -152,7 +154,7 @@ elif algorithm == 'BM25+':
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
+        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
         queries_parsed += 1
 
     writeMode = "w" #first write of clustering output not appending
@@ -221,7 +223,7 @@ elif algorithm == 'TFIDFIMPROVED':
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
+        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
         queries_parsed += 1
 
     writeMode = "w" #first write of clustering output not appending
@@ -290,8 +292,7 @@ elif algorithm == 'DIRICHLET':
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
-        queries_parsed += 1
+        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
 
     writeMode = "w" #first write of clustering output not appending
 
