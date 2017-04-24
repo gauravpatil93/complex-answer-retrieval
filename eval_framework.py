@@ -1,7 +1,6 @@
+import itertools
 from itertools import groupby
 from typing import Dict, List
-
-import itertools
 
 QrelCollection = Dict[str, Dict[str, bool]]
 
@@ -21,7 +20,6 @@ def load_qrels (qrels_reader) -> QrelCollection :
     return {sectionid:
                 {elem.paraid: elem.rel_level for elem in list}
             for sectionid, list in qrelsGrouped}
-
 
 # =============
 #     line = "\t".join([elem.sectionId, "Q0", elem.paraId, str(rank), str(1.0/rank), "mock"])

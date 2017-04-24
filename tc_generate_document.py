@@ -31,7 +31,7 @@ parser.add_argument("paragraph_file", type=str, help="Qualified location of the 
 parser.add_argument("output_file", type=str, help="Name of the output file")
 parser.add_argument("ranking_function", type=str, help="BM25, BM25+, TFIDFIMPROVED, DIRICHLET")
 parser.add_argument("use_cache", type=str, help="cache, no_cache")
-parser.add_argument("passages_extract",type=int, help="no of passages to extract")
+parser.add_argument("passages_extract", type=int, help="no of passages to extract")
 args = vars(parser.parse_args())
 
 query_cbor = args['outline_file']
@@ -160,7 +160,7 @@ elif algorithm == 'TFIDFIMPROVED':
             rank = 0
             for x in value:
                 rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
+                temp_list.append(RankingEntry(x[0][1], x[1], rank, x[2]))
         format_run(writer, temp_list, exp_name='test')
         f.close()
 

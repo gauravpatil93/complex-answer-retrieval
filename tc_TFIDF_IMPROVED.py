@@ -8,7 +8,6 @@ the 0th and 1st term occurrence. For document length normalization, they prefer 
 @author: Gaurav Patil
 """
 
-
 class TDELTAIDF:
 
     useCache = False
@@ -102,5 +101,5 @@ class TDELTAIDF:
             w_by_plus_delta_ln = 1.0 + math.log((w / d) + self.delta)
             outer_ln = 1.0 + math.log(w_by_plus_delta_ln)
             score += self.modified_idf_calculation(key) * outer_ln
-        tup = (query[1], document_id, score)
+        tup = (query, document_id, score)
         return tup

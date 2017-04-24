@@ -2,11 +2,12 @@
 @author: Shilpa Dhagat.
 
 """
-from trec_car.read_data import *
-from nltk.corpus import stopwords
 import re
-from stemming.porter2 import stem
+
 import tagme
+from nltk.corpus import stopwords
+from stemming.porter2 import stem
+from trec_car.read_data import *
 
 GCUBE_TOKEN = "bfbfb535-3683-47c0-bd11-df06d5d96726-843339462"
 DEFAULT_LANG = "en"
@@ -123,7 +124,6 @@ class EntityLinkingRanking:
                 query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
                 enhance_query_list = EntityLinkingRanking.process_text_append_text_mentions(query_id_plain)
                 tup = (query_id_plain, query_id_formatted, enhance_query_list)
-                # print(Ranking.process_text_append_text_mentions(query_id_plain))
                 print(tup)
                 query_tup_list.append(tup)
         return query_tup_list

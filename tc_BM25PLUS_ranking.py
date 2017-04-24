@@ -6,7 +6,11 @@ BM25+
 @author: Gaurav Patil.
 """
 
+
 class BM25PLUS:
+    useCache = False
+    no_of_docs_dict = dict()
+    average_doc_length = 0.0
 
     def __init__(self, query_structure, document_structure):
         """
@@ -29,10 +33,13 @@ class BM25PLUS:
         Calculates the the average length of documents
         :return: average length of documents
         """
-        summ = 0
-        for para_id, ranked_words_dict in self.documents.items():
-            summ += sum(ranked_words_dict.values())
-        return summ/float(self.no_of_documents)
+        if BM25PLUS.useCache:
+            return BM25PLUS.average_doc_length
+        else:
+            summ = 0
+            for para_id, ranked_words_dict in self.documents.items():
+                summ += sum(ranked_words_dict.values())
+            return summ / float(self.no_of_documents)
 
     def modified_idf_calculation(self, query_word):
         """
@@ -48,15 +55,21 @@ class BM25PLUS:
         :param query_word: 
         :return: 
         """
-        if query_word in self.cache:
-            return self.cache[query_word]
+        if BM25PLUS.useCache:
+            if query_word in BM25PLUS.no_of_docs_dict:
+                return float(BM25PLUS.no_of_docs_dict[query_word])
+            else:
+                return 0
         else:
-            no_of_documents_having_the_word = 0
-            for para_id, ranked_word_dict in self.documents.items():
-                if query_word in ranked_word_dict:
-                    no_of_documents_having_the_word += 1
-            self.cache[query_word] = no_of_documents_having_the_word
-            return float(no_of_documents_having_the_word)
+            if query_word in self.cache:
+                return self.cache[query_word]
+            else:
+                no_of_documents_having_the_word = 0
+                for para_id, ranked_word_dict in self.documents.items():
+                    if query_word in ranked_word_dict:
+                        no_of_documents_having_the_word += 1
+                self.cache[query_word] = no_of_documents_having_the_word
+                return float(no_of_documents_having_the_word)
 
     def word_frequency_of_word_in_document(self, word, document_id):
         """
@@ -84,5 +97,5 @@ class BM25PLUS:
             word_freq_in_document = self.word_frequency_of_word_in_document(key, document_id)
             type(word_freq_in_document)
             score += self.modified_idf_calculation(key) * (((self.k_plus_one * word_freq_in_document) / ((self.k * ((1 - self.b) + self.b + (document_length / self.average_length_of_all_documents))) + word_freq_in_document)) + self.delta)
-        tup = (query[1], document_id, score)
+        tup = (query, document_id, score)
         return tup

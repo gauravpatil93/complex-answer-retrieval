@@ -5,6 +5,9 @@ Basic BM25
 @author: Gaurav Patil
 """
 class BM25:
+    useCache = False
+    no_of_docs_dict = dict()
+    average_doc_length = 0.0
 
     def __init__(self, query_structure, document_structure):
         """
@@ -26,11 +29,14 @@ class BM25:
         Calculates the the average length of documents
         :return: average length of documents
         """
-        summ = 0
-        for key, value in self.documents.items():
-            for k, v in value.items():
-                summ += v
-        return summ/float(self.no_of_documents)
+        if BM25.useCache:
+            return BM25.average_doc_length
+        else:
+            summ = 0
+            for key, value in self.documents.items():
+                for k, v in value.items():
+                    summ += v
+            return summ / float(self.no_of_documents)
 
     def inverse_document_frequency(self, query_word):
         """
@@ -47,15 +53,22 @@ class BM25:
         :param query_word: 
         :return: 
         """
-        if query_word in self.cache:
-            return float(self.cache[query_word])
+        if BM25.useCache:
+            if query_word in BM25.no_of_docs_dict:
+                return float(BM25.no_of_docs_dict[query_word])
+            else:
+                return 0
         else:
-            no_of_documents_having_the_word = 0
-            for para_id, ranked_word_dict in self.documents.items():
-                if query_word in ranked_word_dict:
-                    no_of_documents_having_the_word += 1
-            self.cache[query_word] = no_of_documents_having_the_word
-            return float(no_of_documents_having_the_word)
+            if query_word in self.cache:
+                return float(self.cache[query_word])
+            else:
+                no_of_documents_having_the_word = 0
+                for para_id, ranked_word_dict in self.documents.items():
+                    if query_word in ranked_word_dict:
+                        no_of_documents_having_the_word += 1
+                self.cache[query_word] = no_of_documents_having_the_word
+                return float(no_of_documents_having_the_word)
+
 
     def word_frequency_of_word_in_document(self, word, document_id):
         """
@@ -85,5 +98,5 @@ class BM25:
             score += self.inverse_document_frequency(key) * (self.k_plus_one * term_freq) / \
                      (self.k * (1.0 - self.b + self.b * (document_length / self.average_length_of_all_documents))
                       + term_freq)
-        tup = (query[1], document_id, score)
+        tup = (query, document_id, score)
         return tup
