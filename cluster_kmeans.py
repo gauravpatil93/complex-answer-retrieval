@@ -10,7 +10,9 @@ import sklearn.feature_extraction.text as skTextFeatures
 import sklearn.pipeline as skPipeline
 import sklearn.cluster as skCluster
 import sklearn.metrics.pairwise as pairwise
+from tc_Ranking import Ranking
 
+NUM_EXTRA_CLUSTERS = 0
 
 def mapToNames(bagsOfWords, section_names):
     maps = {}
@@ -27,30 +29,14 @@ def mapToNames(bagsOfWords, section_names):
     grabBagVectors = vectorizer.fit_transform(grabBag)
     similarities = pairwise.cosine_similarity(grabBagVectors)
 
-    availSlots = [0 for b in section_names]
     for name in section_names:
-        maps[name] = similarities[section_names.index(name)][len(section_names):]
-
-    permutations = [q for q in itertools.permutations(range(len(section_names)))]
-    bestPermutation = range(len(section_names))
-    bestScore = 0
-
-    for permutation in permutations:
-        score = 0
-        for value in permutation:
-            section = section_names[permutation.index(value)]
-            score += maps[section][value]
-        if score > bestScore:
-            bestScore = score
-            bestPermutation = permutation
-    
-    for value in bestPermutation:
-        section = section_names[bestPermutation.index(value)]
-        maps[section] = value
+        value = numpy.argmax(similarities[section_names.index(name)][len(section_names):])
+        maps[name] = value
 
     return maps
 
 def generateRanking(sectionName, bagOfParagraphs, labels):
+    "Generates a list of (score, passageId, sectionName) tuples"
     ranking = {}
     workList = [sectionName] + bagOfParagraphs
     vectorizer = skTextFeatures.TfidfVectorizer()
@@ -63,48 +49,58 @@ def generateRanking(sectionName, bagOfParagraphs, labels):
         ranking[labels[i]] = scores[i]
 
     #generate our output list for a ranking
-    sortedList = list((ranking.get(i), i) for i in ranking.keys())
+    sortedList = list((ranking.get(i), i, sectionName) for i in ranking.keys())
     sortedList = sorted(sortedList, key=lambda x: x[0], reverse=True)
 
-    #print out test ranking
+    #debug: print out test ranking
+    """
+    print("SectionName: %s" %(sectionName))
     for i in range(1,len(labels)+1):
         print("%i %s %f" %(i, sortedList[i-1][1],sortedList[i-1][0]))
     print("\n\n")
+    """
     return(sortedList)
 
-def runKMeansPipeline(myData):
-    #takes a tuple of values
+def runKMeansPipeline(myData, num_clusters=None):
+    """Runs kmeans on a single page's worth of passages and section names
+    Input: pagename (str), query names (section_names) (str), cluster_paragraphs (list[passageids,passagetext]),
+    queryIds (string)
+    """
     pageName = myData[0]
-    cluster_names = myData[1]
+    section_names = myData[1]
     cluster_paragraphs = myData[2] #[0] is id, [1] is text
-    cluster_pTexts = [paragraph[1] for paragraph in cluster_paragraphs]
+    queryids = myData[3]
+    
+    if(num_clusters is not None):
+        NUM_EXTRA_CLUSTERS = num_clusters
 
+
+    section_names_formatted = [Ranking.process_text_query_plain(section_name) for section_name in section_names]
+    
+    cluster_pTexts = [paragraph[1] for paragraph in cluster_paragraphs]
+    numClusters = len(section_names) + NUM_EXTRA_CLUSTERS 
     print("\n\nRunning Kmeans on page ''%s''\n" %(pageName))
-    print("Number of clusters %i Number of paragraphs %i\n" %(len(cluster_names), len(cluster_pTexts)))
+    print("Number of clusters %i Number of paragraphs %i\n" %(numClusters, len(cluster_pTexts)))
     vectorizer = skTextFeatures.TfidfVectorizer()
     cluster_vectors = vectorizer.fit_transform(cluster_pTexts)
 
-    #set up and run kmeans
-    km = skCluster.KMeans(n_clusters=len(cluster_names), init='k-means++', max_iter=100, n_init=10)
+    km = skCluster.KMeans(n_clusters=numClusters, init='k-means++', max_iter=100, n_init=10)
     km.fit(cluster_vectors)
 
-    finalClusters = [[] for elem in cluster_names]
-    finalLabels = [[] for elem in cluster_names]
-
+    finalClusters = [[] for elem in range(numClusters)]
+    finalLabels = [[] for elem in range(numClusters)]
 
     for i in range(len(km.labels_)):
         finalClusters[km.labels_[i]].append(deepcopy(cluster_paragraphs[i][1]))
         finalLabels[km.labels_[i]].append(deepcopy(cluster_paragraphs[i][0]))
 
-    #put clustered text into giant textblob per category
-    bagsOfWords = ["" for elem in cluster_names]
-    for i in range(len(cluster_names)):
+    bagsOfWords = ["" for elem in range(numClusters)]
+    for i in range(numClusters):
         for j in finalClusters[i]:
             bagsOfWords[i] += j
 
-    #make a mapping of names
-    maps = mapToNames(bagsOfWords, cluster_names)
+    maps = mapToNames(bagsOfWords, section_names_formatted)
     rankings = []
-    for name in cluster_names:
-        rankings.append(generateRanking(name,finalClusters[maps[name]],finalLabels[maps[name]]))
+    for name, queryid in zip(section_names_formatted, queryids):
+        rankings.append(generateRanking(queryid,finalClusters[maps[name]],finalLabels[maps[name]]))
     return rankings
