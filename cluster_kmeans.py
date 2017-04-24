@@ -80,6 +80,11 @@ def runKMeansPipeline(myData, num_clusters=None):
     cluster_pTexts = [paragraph[1] for paragraph in cluster_paragraphs]
     numClusters = len(section_names) + NUM_EXTRA_CLUSTERS 
     print("\n\nRunning Kmeans on page ''%s''\n" %(pageName))
+
+    if(len(cluster_pTexts) < numClusters):
+        print("Fewer paragraphs to cluster than clusters, setting number of clusters = number of paragraphs")
+        numClusters = len(cluster_pTexts)
+
     print("Number of clusters %i Number of paragraphs %i\n" %(numClusters, len(cluster_pTexts)))
     vectorizer = skTextFeatures.TfidfVectorizer()
     cluster_vectors = vectorizer.fit_transform(cluster_pTexts)

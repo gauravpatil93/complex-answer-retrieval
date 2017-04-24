@@ -16,13 +16,15 @@ import cluster_kmeans
 """
 Run this file to generate the results.run file
 
-This file takes 5 arguments. 
+This file takes 7 arguments. 
 
 outline file
 paragraph file
 output file
 ranking function (BM25, BM25+, TFIDFIMPROVED, DIRICHLET)
-cache or no_cache ( Note cache only works for TFIDF and DIRICHLET) methods
+number of extra clusters (int)
+number of passages to extract per corpus
+number of passages per assigned section
 
 @author: Gaurav Patil.
 """
@@ -45,6 +47,14 @@ algorithm = args['ranking_function']
 passages_extract = args['passages_extract']
 num_clusters = args['number of clusters']
 passages_per_section = args['passages per section']
+
+query_structure = None
+document_structure = None
+logic_instance = None
+document_texts = None
+page_structure = None
+queryCollections = None
+
 
 if algorithm == 'BM25':
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
@@ -73,48 +83,7 @@ if algorithm == 'BM25':
             sectionIds.append(sectionpath[0:-1]) #clip off the last "/"
             sectionNames.append(sectionphrase[0:-1]) #clip off the last space
         queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
-
-
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(logic_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
-        queries_parsed += 1
-
-    writeMode = "w" #first write of clustering output not appending
-
-    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
-    for collection in queryCollections:
-        data = list()
-        data.append(collection[1])
-        data.append(collection[2])
-        paragraphs = set()
-        for queryid in collection[3]:
-            for scoretup in query_scores[queryid]:
-                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
-        data.append(list(paragraphs))
-        data.append(collection[3])
-        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
-        print("Writing one page output to file...............................................\n")
-
-        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
-            writer = f
-            temp_list = []
-            for rankingsList in rankings:
-                for ranking in rankingsList:
-                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
-            format_run(writer, temp_list, exp_name='test')
-            f.close()
-        writeMode = "a" #all further writes to append to file
-        
+   
 elif algorithm == 'BM25+':
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
     query_structure = ranking.gather_queries()
@@ -143,45 +112,6 @@ elif algorithm == 'BM25+':
             sectionNames.append(sectionphrase[0:-1]) #clip off the last space
         queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(logic_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
-        queries_parsed += 1
-
-    writeMode = "w" #first write of clustering output not appending
-
-    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
-    for collection in queryCollections:
-        data = list()
-        data.append(collection[1])
-        data.append(collection[2])
-        paragraphs = set()
-        for queryid in collection[3]:
-            for scoretup in query_scores[queryid]:
-                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
-        data.append(list(paragraphs))
-        data.append(collection[3])
-        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
-        print("Writing one page output to file...............................................\n")
-
-        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
-            writer = f
-            temp_list = []
-            for rankingsList in rankings:
-                for ranking in rankingsList:
-                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
-            format_run(writer, temp_list, exp_name='test')
-            f.close()
-        writeMode = "a" #all further writes to append to file
 
 elif algorithm == 'TFIDFIMPROVED':
 
@@ -212,46 +142,6 @@ elif algorithm == 'TFIDFIMPROVED':
             sectionNames.append(sectionphrase[0:-1]) #clip off the last space
         queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(logic_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
-        queries_parsed += 1
-
-    writeMode = "w" #first write of clustering output not appending
-
-    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
-    for collection in queryCollections:
-        data = list()
-        data.append(collection[1])
-        data.append(collection[2])
-        paragraphs = set()
-        for queryid in collection[3]:
-            for scoretup in query_scores[queryid]:
-                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
-        data.append(list(paragraphs))
-        data.append(collection[3])
-        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
-        print("Writing one page output to file...............................................\n")
-
-        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
-            writer = f
-            temp_list = []
-            for rankingsList in rankings:
-                for ranking in rankingsList:
-                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
-            format_run(writer, temp_list, exp_name='test')
-            f.close()
-        writeMode = "a" #all further writes to append to file
-
 elif algorithm == 'DIRICHLET':
 
     ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
@@ -281,46 +171,48 @@ elif algorithm == 'DIRICHLET':
             sectionNames.append(sectionphrase[0:-1]) #clip off the last space
         queryCollections.append((mypageid, mypagename, deepcopy(sectionNames),deepcopy(sectionIds)))
 
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(logic_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
-
-    writeMode = "w" #first write of clustering output not appending
-
-    #generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
-    for collection in queryCollections:
-        data = list()
-        data.append(collection[1])
-        data.append(collection[2])
-        paragraphs = set()
-        for queryid in collection[3]:
-            for scoretup in query_scores[queryid]:
-                paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
-        data.append(list(paragraphs))
-        data.append(collection[3])
-        rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
-        print("Writing one page output to file...............................................\n")
-
-        with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
-            writer = f
-            temp_list = []
-            for rankingsList in rankings:
-                for ranking in rankingsList:
-                    temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
-            format_run(writer, temp_list, exp_name='test')
-            f.close()
-        writeMode = "a" #all further writes to append to file
-
 else:
     print("Invalid ranking function")
     exit()
+
+# Generate the query scores
+print("Generating the output structure by calculating scores................\n")
+query_scores = dict()
+queries_parsed = 0
+for query in query_structure:
+    temp_list = []
+    print(queries_parsed)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
+    temp_list.sort(key=lambda m: m[2])
+    temp_list.reverse()
+    query_scores[query[1]] = deepcopy(temp_list[0:passages_per_section])
+    queries_parsed += 1
+
+writeMode = "w" #first write of clustering output not appending
+
+#generate the input for kmeans: (pagename(plaintext), section_names, paragraphs((id,text) list), queryids)
+for collection in queryCollections:
+    data = list()
+    data.append(collection[1])
+    data.append(collection[2])
+    paragraphs = set()
+    for queryid in collection[3]:
+        for scoretup in query_scores[queryid]:
+            paragraphs = paragraphs | {(scoretup[1],document_texts[scoretup[1]])}
+    data.append(list(paragraphs))
+    data.append(collection[3])
+    rankings = cluster_kmeans.runKMeansPipeline(data, num_clusters)
+
+    print("Writing one page's output to file...............................................\n")
+
+    with open(output_file_name, mode=writeMode, encoding='UTF-8') as f:
+        writer = f
+        temp_list = []
+        for rankingsList in rankings:
+            for ranking in rankingsList:
+                temp_list.append(RankingEntry(ranking[2], ranking[1], rankingsList.index(ranking) + 1, ranking[0]))
+        format_run(writer, temp_list, exp_name='test')
+        f.close()
+    writeMode = "a" #all further writes to append to file
 
