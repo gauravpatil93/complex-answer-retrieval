@@ -124,20 +124,6 @@ class Ranking:
             _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/query_structure_cache"), "wb"))
         return query_tup_list
 
-    def gather_queries_and_page(self):
-        """
-        Gathers the queries and corresponding pagename
-        :return: query_structure (query_id_plain, query_id_formatted, Ranking.process_text_query(query_id_plain, page.page_name) list 
-        """
-        query_tup_list = []
-        for page in self.pages:
-            for section_path in page.flat_headings_list():
-                query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
-                query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
-                tup = (query_id_plain, query_id_formatted, Ranking.process_text_query(query_id_plain), page.page_name)
-                query_tup_list.append(tup)
-        return query_tup_list
-
     def get_queries(self):
         """
         :return: returns the query structure list
