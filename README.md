@@ -151,14 +151,18 @@ python3 trec_cluster_generate_document.py [outline.cbor] [paragraphs.cbor] [outp
 ============================================================================================================================
 Gaurav's Results
 ============================================================================================================================
-using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
+using test 200's hierarchical qrel file and 10,000 passages from release1.4.v
 
-Reranking top 1000:
+Reranking top 100:
+map   :0.0013
+r-prec:0.0015
 
-top 1000 without re-ranking:
+top 100 without re-ranking:
+map   :
+r-prec:
 
 Experiment for comparing our pipelines:
-50,000 passages release1.4.v test200's hierarchical qrel.
+50,000 passages release1.4.v test200's hierarchical qrel. (Re-rank) top500
 
 map    :0.0031
 r-prec :0.0027
