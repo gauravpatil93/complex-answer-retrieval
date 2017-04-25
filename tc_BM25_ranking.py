@@ -4,6 +4,8 @@ import math
 Basic BM25
 @author: Gaurav Patil
 """
+
+
 class BM25:
     useCache = False
     no_of_docs_dict = dict()
