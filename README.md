@@ -150,15 +150,17 @@ Not correctly functioning source code for that in trec_cluster_full. For evaluat
 ============================================================================================================================
 Gaurav's Results
 ============================================================================================================================
-using test 200's hierarchichal qrel file and 1,000,000 passages from release1.4.v
-( Note results are lower than last time's dirichlet's implementation because only map for top n is always a little lower than the complete set )
+using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
 
 Reranking top 1000:
 
-map - 0.1348
-r-prec - 0.1548
+top 1000 without re-ranking:
 
-Calculating the map and r-prec for top 1000 without re-rank:
+Experiment for comparing out pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
+
+map    :0.0031
+r-prec :0.0027
 
 
 
