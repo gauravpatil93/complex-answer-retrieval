@@ -15,7 +15,6 @@ DEFAULT_REL_API = "https://tagme.d4science.org/tagme/rel"
 """
 This class contains methods that generate the structure that is used by the ranking functions.
 @author: Gaurav Patil.
-@modified: Shilpa Dhagat ( Added method related to entity linking to refactor this class )
 """
 
 
