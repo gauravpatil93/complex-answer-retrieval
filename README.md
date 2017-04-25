@@ -2,7 +2,7 @@
 Repository contains code submission for CS 980 (Data Science) assignments
 
 ```
-List of dependencies:
+List of dependencies: ( No changes from prototype 2 )
 
 Run on Python 3.5.2
 NLTK           :conda install -c anaconda nltk=3.2.2
@@ -131,7 +131,7 @@ Re-ranking top n queries using multiple retrieval algorithms,
 Retrieving top n results for comparision, 
 Expanded cache to all retrieval algorithms implemented in prototype 2, 
 Implemented caching for tagme enhanced queries and passages, 
-Update datastructures for existing retrieval methods, 
+Updated data structures for existing retrieval methods, 
 Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, 
 Refactored redundant code and removed minimized non-essential code.
 ```
