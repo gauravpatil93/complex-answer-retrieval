@@ -43,6 +43,11 @@ retrieval_algorithm = args['retrieval_algorithm']
 cache_flag = args['use_cache']
 passages_count = args['passages_count']
 
+re_rank = None
+query_structure = None
+document_structure = None
+
+
 
 def execute_rocchio(query_text, corpus_text, ir):
     print('Executing Rocchio Algorithm')
@@ -62,145 +67,86 @@ def execute_rocchio(query_text, corpus_text, ir):
         # the system updates the original query based on Rocchio's formula.
     rocchio = RocchioAlgorithm(query_text, corpus_text, rankings, ir)
 
+
 if retrieval_algorithm == 'DIRICHLET':
     if cache_flag == 'cache':
-            DIRICHLET.useCache = True
-            query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/entitylink/entity_query_structure_cache"), "rb"))
-            document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/entitylink/entity_paragraph_structure_cache"), "rb"))
-            DIRICHLET.number_of_words_in_the_collection_s = \
-                    _pickle.load(open(os.path.join(os.curdir, "cache/entitylink/enhanced_entity_words"), "rb"))
-            DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/entitylink/entity_terms_freq_dict"), "rb"))
-            logic_instance = DIRICHLET(query_structure, document_structure, 2500)
+        DIRICHLET.useCache = True
+        DIRICHLET.number_of_words_in_the_collection_s = \
+            _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
+        DIRICHLET.all_words_freq_dict = _pickle.load(
+            open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
+        primary = DIRICHLET(query_structure, document_structure)
+
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.gather_entity_enhanced_queries_mentions()
-        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
-        logic_instance = DIRICHLET(query_structure, document_structure, 2500)
+        query_structure = ranking.get_enhanced_queries()
+        document_structure = ranking.get_enhanced_paragraphs()
+        primary = DIRICHLET(query_structure, document_structure)
 
-    print("No of queries" + str(len(query_structure)))
-    print("No of documents" + str(len(document_structure)))
-
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(logic_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
-        queries_parsed += 1
-
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
 
 elif retrieval_algorithm == 'TFIDFIMPROVED':
 
-    ranking = Ranking(query_cbor, paragraphs_cbor, output_file_name)
+    if cache_flag == 'cache':
+        TDELTAIDF.useCache = True
+        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
+        document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
+        print("No of queries" + str(len(query_structure)))
+        print("No of documents" + str(len(document_structure)))
+        TDELTAIDF.average_doc_length = _pickle.load(
+            open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
+        TDELTAIDF.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
+        primary = TDELTAIDF(query_structure, document_structure)
 
-    # ranking = EntityLinkingAndRelevance(query_cbor, paragraphs_cbor, output_file_name)
+    else:
+        ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
+        query_structure = ranking.get_enhanced_queries()
+        document_structure = ranking.get_enhanced_paragraphs()
+        primary = TDELTAIDF(query_structure, document_structure)
 
-    query_structure = ranking.gather_entity_enhanced_queries_mentions()
-    paragraph_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
-
-    # rocchio = execute_rocchio(query_structure, paragraph_structure)
-
-    query_structure = ranking.gather_entity_enhanced_queries_mentions()
-    # print(query_structure)
-    document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
-
-    retrival_algo_instance = TDELTAIDF(query_structure, document_structure)
-
-    print("No of queries" + str(len(query_structure)))
-    print("No of documents" + str(len(document_structure.keys())))
-
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(retrival_algo_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
-        queries_parsed += 1
-
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
 
 elif retrieval_algorithm == "BM25":
 
-    ranking = Ranking(query_cbor, paragraphs_cbor, output_file_name)
+    if cache_flag == 'cache':
+        BM25.useCache = True
+        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
+        document_structure = _pickle.load(open(os.path.join(os.curdir, "cache/paragraph_structure"), "rb"))
+        print("No of queries" + str(len(query_structure)))
+        print("No of documents" + str(len(document_structure)))
+        BM25.average_doc_length = _pickle.load(
+            open(os.path.join(os.curdir, "cache/average_length_of_documents"), "rb"))
+        BM25.no_of_docs_dict = _pickle.load(open(os.path.join(os.curdir, "cache/no_of_docs_with_term"), "rb"))
+        primary = BM25(query_structure, document_structure)
 
-    query_structure = ranking.gather_queries()
-    # print(query_structure)
-    document_structure = ranking.gather_paragraphs()
+    else:
+        ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
+        query_structure = ranking.get_enhanced_queries()
+        document_structure = ranking.get_enhanced_paragraphs()
+        primary = BM25(query_structure, document_structure)
 
-    retrival_algo_instance = BM25(query_structure, document_structure)
+# Generate the query scores
+print("Generating the output structure by calculating scores................\n")
+query_scores = dict()
+queries_parsed = 0
+for query in query_structure:
+    temp_list = []
+    print(queries_parsed)
+    for key, value in document_structure.items():
+        temp_list.append(primary.score(query, key))
+    temp_list.sort(key=lambda m: m[2])
+    temp_list.reverse()
+    query_scores[query[1]] = deepcopy(temp_list)
+    queries_parsed += 1
 
-    print("No of queries" + str(len(query_structure)))
-    print("No of documents" + str(len(document_structure.keys())))
-
-    # Generate the query scores
-    print("Generating the output structure by calculating scores................\n")
-    query_scores = dict()
-    queries_parsed = 0
-    for query in query_structure:
-        temp_list = []
-        print(queries_parsed)
-        for key, value in document_structure.items():
-            temp_list.append(retrival_algo_instance.score(query, key))
-        temp_list.sort(key=lambda m: m[2])
-        temp_list.reverse()
-        query_scores[query[1]] = deepcopy(temp_list)
-        queries_parsed += 1
-
-    # Write the results to a file
-    print("Writing output to file...............................................\n")
-    with open(output_file_name, mode='w', encoding='UTF-8') as f:
-        writer = f
-        temp_list = []
-        count = 0
-        for k3, value in query_scores.items():
-            count += 1
-            rank = 0
-            for x in value:
-                rank += 1
-                temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
-        format_run(writer, temp_list, exp_name='test')
-        f.close()
-
-else:
-    exit()
-
-
+# Write the results to a file
+print("Writing output to file...............................................\n")
+with open(output_file_name, mode='w', encoding='UTF-8') as f:
+    writer = f
+    temp_list = []
+    count = 0
+    for k3, value in query_scores.items():
+        count += 1
+        rank = 0
+        for x in value:
+            rank += 1
+            temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
+    format_run(writer, temp_list, exp_name='test')

@@ -47,7 +47,7 @@ document_structure = None
 primary = None
 re_rank = None
 
-if tagme_enabled == "un_enchanced":
+if tagme_enabled == "un_enhanced":
     #
     #
     #
@@ -142,7 +142,7 @@ if tagme_enabled == "un_enchanced":
             primary = TDELTAIDF(query_structure, document_structure)
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
 
-elif tagme_enabled == "enchanced":
+elif tagme_enabled == "enhanced":
     #
     #
     #
