@@ -134,12 +134,13 @@ eval_framework.py [qrels] [run]
 Implemented by Colin
 in folder trec_cluster_basic run the run.sh script to get a sample clustering followed by ranking
 Accepts inputs and explains possible input values on running with no arguments.
-However, crashes for runs with large sizes of number of clusters (number of queries).
 
 
-A more efficient method for assigning queries to clusters will be needed for applied use. Almost synced up to run on modified
-results for Dirchilets smoothing algorithm but the above problem prevents that.
-Not correctly functioning source code for that in trec_cluster_full. For evaluation of how that is coming along the code files not identical to an iteration of Gaurav's implementation are trec_cluster_generate_document.py (the main program file), and cluster_kmeans.py (a callable version of the kmeans clustering and mapping returning rankings). trec_cluster_Ranking.py just has slight modifications to Gaurav's ranking class to have his code give output processable by clustering.
+Now (prototype 3) synced up with guarav's implementation in trec_cluster_generate_document.py, but no caching achieved
+
+to run
+
+python3 trec_cluster_generate_document.py [outline.cbor] [paragraphs.cbor] [outputfilename] [rankingfunction] [number of additional clusters] [number of passages to extract] [passages per section]
 ```
 
 
@@ -175,11 +176,15 @@ p@5     :0.00036
 r-prec  :0.00075
 map     :0.00082)
 
-
-
 ============================================================================================================================
 Colin's Results
 ============================================================================================================================
+using test 200's hierarchichal qrel file and 50,000 passages from release1.4.
+
+python3 trec_cluster_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs TFIDFIMPROVED_cluster.run TFIDFIMPROVED 6 50000 20 
+
+map                     all 0.0009
+Rprec                   all 0.0009
 
 **************** Prototype 2 Results: ****************
 DIRICHLETS SMOOTHING ALGORITHM
