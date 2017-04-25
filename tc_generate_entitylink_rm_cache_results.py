@@ -6,7 +6,7 @@ from copy import deepcopy
 from trec_car.format_runs import *
 
 from tc_DIRICHLET import DIRICHLET
-from tc_entitylink_ranking import EntityLinkingRanking
+from tc_Ranking import Ranking
 from tc_TFIDF_IMPROVED import TDELTAIDF
 from tc_BM25_ranking import BM25
 from tc_Rocchio_algo import RocchioAlgorithm
@@ -72,7 +72,7 @@ if retrieval_algorithm == 'DIRICHLET':
             DIRICHLET.all_words_freq_dict = _pickle.load(open(os.path.join(os.curdir, "cache/entitylink/entity_terms_freq_dict"), "rb"))
             logic_instance = DIRICHLET(query_structure, document_structure, 2500)
     else:
-        ranking = EntityLinkingRanking(query_cbor, paragraphs_cbor, passages_count)
+        ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
         query_structure = ranking.gather_entity_enhanced_queries_mentions()
         document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         logic_instance = DIRICHLET(query_structure, document_structure, 2500)
@@ -111,7 +111,7 @@ if retrieval_algorithm == 'DIRICHLET':
 
 elif retrieval_algorithm == 'TFIDFIMPROVED':
 
-    ranking = EntityLinkingRanking(query_cbor, paragraphs_cbor, output_file_name)
+    ranking = Ranking(query_cbor, paragraphs_cbor, output_file_name)
 
     # ranking = EntityLinkingAndRelevance(query_cbor, paragraphs_cbor, output_file_name)
 
@@ -160,7 +160,7 @@ elif retrieval_algorithm == 'TFIDFIMPROVED':
 
 elif retrieval_algorithm == "BM25":
 
-    ranking = EntityLinkingRanking(query_cbor, paragraphs_cbor, output_file_name)
+    ranking = Ranking(query_cbor, paragraphs_cbor, output_file_name)
 
     query_structure = ranking.gather_queries()
     # print(query_structure)
