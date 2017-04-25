@@ -25,7 +25,7 @@ parser.add_argument("re-ranking_algorithm", type=str, help="BM25, BM25+, TFIDFIM
 parser.add_argument("use_cache", type=str, help="cache, no_cache")
 parser.add_argument("no_of_results_to_re-rank", type=int, help="Select how many to re-rank")
 parser.add_argument("passages_extract", type=int, help="no of passages to extract")
-parser.add_argument("tagme_enchanced", type=str, help="enchanced or un_enchanced")
+parser.add_argument("tagme_enchanced", type=str, help="enhanced or un_enhanced")
 args = vars(parser.parse_args())
 
 query_cbor = args['outline_file']
@@ -47,7 +47,7 @@ document_structure = None
 primary = None
 re_rank = None
 
-if tagme_enabled == "un_enchanced":
+if tagme_enabled == "un_enhanced":
     #
     #
     #
@@ -142,7 +142,7 @@ if tagme_enabled == "un_enchanced":
             primary = TDELTAIDF(query_structure, document_structure)
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
 
-elif tagme_enabled == "enchanced":
+elif tagme_enabled == "enhanced":
     #
     #
     #
@@ -170,8 +170,8 @@ elif tagme_enabled == "enchanced":
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             primary = BM25(query_structure, document_structure)
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
     #
@@ -201,8 +201,8 @@ elif tagme_enabled == "enchanced":
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             primary = BM25PLUS(query_structure, document_structure)
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
     #
@@ -232,10 +232,13 @@ elif tagme_enabled == "enchanced":
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             primary = TDELTAIDF(query_structure, document_structure)
             re_rank = DIRICHLET(query_structure, document_structure, 2500)
+else:
+    print("Use enhanced or un_enhanced")
+    exit()
 
 # Generate the query scores
 print("Generating the output structure by calculating scores................\n")

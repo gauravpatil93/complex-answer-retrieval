@@ -23,7 +23,7 @@ parser.add_argument("ranking_function", type=str, help="BM25, BM25+, TFIDFIMPROV
 parser.add_argument("use_cache", type=str, help="cache, no_cache")
 parser.add_argument("only_top_n", type=int, help="Select top_n results")
 parser.add_argument("passages_extract", type=int, help="no of passages to extract")
-parser.add_argument("tagme_enchanced", type=str, help="enchanced or un_enchanced")
+parser.add_argument("tagme_enchanced", type=str, help="enhanced or un_enhanced")
 args = vars(parser.parse_args())
 
 query_cbor = args['outline_file']
@@ -44,7 +44,7 @@ document_structure = None
 logic_instance = None
 
 
-if tagme_enabled == "un_enchanced":
+if tagme_enabled == "un_enhanced":
     if algorithm == 'BM25':
         if cache_flag == 'cache':
             BM25.useCache = True
@@ -119,8 +119,8 @@ elif tagme_enabled == "enhanced":
             logic_instance = BM25(query_structure, document_structure)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             print("No of queries" + str(len(query_structure)))
             print("No of documents" + str(len(document_structure)))
             logic_instance = BM25(query_structure, document_structure)
@@ -139,8 +139,8 @@ elif tagme_enabled == "enhanced":
             logic_instance = DIRICHLET(query_structure, document_structure, 2500)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             print("No of queries" + str(len(query_structure)))
             print("No of documents" + str(len(document_structure)))
             logic_instance = BM25PLUS(query_structure, document_structure)
@@ -159,8 +159,8 @@ elif tagme_enabled == "enhanced":
             logic_instance = TDELTAIDF(query_structure, document_structure)
         else:
             ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
-            query_structure = ranking.get_enhanced_queries()
-            document_structure = ranking.get_enhanced_paragraphs()
+            query_structure = ranking.gather_entity_enhanced_queries_mentions()
+            document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
             print("No of queries" + str(len(query_structure)))
             print("No of documents" + str(len(document_structure)))
             logic_instance = TDELTAIDF(query_structure, document_structure)
