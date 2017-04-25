@@ -36,7 +36,7 @@ primary_retrieval_algorithm = args["primary_retrieval_algorithm"]
 reranking_algorithm = args["re-ranking_algorithm"]
 rerank_n = args["no_of_results_to_re-rank"]
 passages_extract = args["passages_extract"]
-tagme_enabled =  args["tagme_enchanced"]
+tagme_enabled = args["tagme_enchanced"]
 
 if passages_extract < rerank_n:
     print("The no of passages extracted should be greater than the number of results to be re-ranked")
