@@ -156,7 +156,7 @@ Reranking top 1000:
 
 top 1000 without re-ranking:
 
-Experiment for comparing out pipelines:
+Experiment for comparing our pipelines:
 50,000 passages release1.4.v test200's hierarchical qrel.
 
 map    :0.0031
@@ -171,6 +171,11 @@ Shilpa's Results
 
 
 
+
+
+============================================================================================================================
+Colin's Results
+============================================================================================================================
 
 **************** Prototype 2 Results: ****************
 DIRICHLETS SMOOTHING ALGORITHM
