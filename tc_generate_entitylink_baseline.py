@@ -11,9 +11,7 @@ from tc_entitylink_ranking import EntityLinkingRanking
 This class can be run to compare results from Baseline BM25 retrieval method with
 or without entitylink linking expansion.
 Generates trec_eval compatible run file
-
 """
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("outline_file", type=str, help="Qualified location of the outline file")
@@ -76,9 +74,7 @@ elif use_entity_linking == "notenhanced":
     query_structure = ranking.gather_queries()
     # print(query_structure)
     document_structure = ranking.gather_paragraphs()
-
     bm25_instance = BM25(query_structure, document_structure)
-
     print("No of queries" + str(len(query_structure)))
     print("No of documents" + str(len(document_structure.keys())))
 

@@ -34,8 +34,8 @@ if tagme_flag == "un_enhanced":
     query_structure = ranking.gather_queries()
     document_structure = ranking.gather_paragraphs()
 elif tagme_flag == "enhanced":
-    query_structure = ranking.get_enhanced_queries()
-    document_structure = ranking.get_enhanced_paragraphs()
+    query_structure = ranking.gather_entity_enhanced_queries_mentions()
+    document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
 else:
     print("Select enhanced or unenhanced")
     exit()

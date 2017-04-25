@@ -43,6 +43,7 @@ retrieval_algorithm = args['retrieval_algorithm']
 cache_flag = args['use_cache']
 passages_count = args['passages_count']
 
+primary = None
 re_rank = None
 query_structure = None
 document_structure = None
@@ -79,8 +80,8 @@ if retrieval_algorithm == 'DIRICHLET':
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         primary = DIRICHLET(query_structure, document_structure)
 
 
@@ -99,8 +100,8 @@ elif retrieval_algorithm == 'TFIDFIMPROVED':
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         primary = TDELTAIDF(query_structure, document_structure)
 
 
@@ -119,8 +120,8 @@ elif retrieval_algorithm == "BM25":
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         primary = BM25(query_structure, document_structure)
 
 # Generate the query scores
