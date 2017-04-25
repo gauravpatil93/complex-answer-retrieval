@@ -35,10 +35,6 @@ class Ranking:
         self.paragraph_file = paragraph_file
         self.enable_cache = enable_cache
         self.pages = self.gather_pages()
-        self.queries = self.gather_queries()
-        self.paragraphs = self.gather_paragraphs()
-        self.enhanced_queries = self.gather_entity_enhanced_queries_mentions()
-        self.enhanced_paragraphs = self.gather_entity_enhanced_paragraphs_mentions()
 
     def gather_pages(self):
         """
@@ -201,6 +197,9 @@ class Ranking:
                 tup = (query_id_plain, query_id_formatted, enhance_query_list)
                 print(tup)
                 query_tup_list.append(tup)
+        if self.enable_cache is True:
+            print(" Query cache created successfully ")
+            _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/query_structure_cache"), "wb"))
         return query_tup_list
 
     def gather_entity_enhanced_paragraphs_mentions(self):
@@ -209,6 +208,9 @@ class Ranking:
             for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_append_text_mentions(p.get_text())
                 print(id_to_text_dict[p.para_id])
+        if self.enable_cache is True:
+            print(" Paragraph cache created successfully ")
+            _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "cache/paragraph_structure"), "wb"))
         return id_to_text_dict
 
     def gather_entity_enhanced_queries_annotations(self):
@@ -220,6 +222,9 @@ class Ranking:
                 enhance_query_list = Ranking.process_text_append_text_annotations(query_id_plain)
                 tup = (query_id_plain, query_id_formatted, enhance_query_list )
                 query_tup_list.append(tup)
+        if self.enable_cache is True:
+            print(" Query cache created successfully ")
+            _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/query_structure_cache"), "wb"))
         return query_tup_list
 
     def gather_entity_enhanced_paragraphs_annotations(self):
@@ -227,28 +232,7 @@ class Ranking:
         with open(self.paragraph_file, 'rb') as f:
             for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_append_text_annotations(p.get_text())
+        if self.enable_cache is True:
+            print(" Paragraph cache created successfully ")
+            _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "cache/paragraph_structure"), "wb"))
         return id_to_text_dict
-
-    def get_queries(self):
-        """
-        :return: returns the query structure list
-        """
-        return self.queries
-
-    def get_paragraphs(self):
-        """
-        :return: returns the paragraph structure
-        """
-        return self.paragraphs
-
-    def get_enhanced_queries(self):
-        """
-        :return: returns tagme enchanced query structure
-        """
-        return self.enhanced_queries
-
-    def get_enhanced_paragraphs(self):
-        """
-        :return: returns tagme enchanced paragraph structure
-        """
-        return self.enhanced_paragraphs
