@@ -142,7 +142,26 @@ to run
 
 python3 trec_cluster_generate_document.py [outline.cbor] [paragraphs.cbor] [outputfilename] [rankingfunction] [number of additional clusters] [number of passages to extract] [passages per section]
 ```
+# Entity Linking with relevance model Implementation
+```
+First create Cache for Tagme me enhanced data using Gaurav's Cache implemenatation:
+tc_generate_document_cache.py 
+This file takes three input parameters:
+Outline file, paragraph file and number of passages you want to extract.
+Example run: 
+python tc_generate_document_cache.py all.test200.cbor.outlines release-v1.4.paragraphs 50000
 
+tc_generate_entitylink_rm_cache_results.py for performing entity linking with query expansion using rocchio relevance model. This will generate output file used in evaluation framework. This file takes 6 parameters:
+outlines file, paragraph file, output file, retrieval algorithm, use_cache and number of passages to extract
+Example run: 
+python tc_generate_entitylink_rm_cache_results.py all.test200.cbor.outlines release-v1.4.paragraphs output.run BM25 cache 50000
+
+Finally run the evaluation framework:
+eval_framework.py This is for evaluating the results. This takes two parameters:
+qrels file and output file
+Example run: 
+	python eval_framework.py all.test200.cbor.hierarchical.qrels output.run
+```
 
 # Results (Updated from Prototype 3)
 
@@ -151,18 +170,14 @@ python3 trec_cluster_generate_document.py [outline.cbor] [paragraphs.cbor] [outp
 ============================================================================================================================
 Gaurav's Results
 ============================================================================================================================
-using test 200's hierarchical qrel file and 10,000 passages from release1.4.v
+using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
 
-Reranking top 100:
-map   :0.0013
-r-prec:0.0015
+Reranking top 1000:
 
-top 100 without re-ranking:
-map   :
-r-prec:
+top 1000 without re-ranking:
 
 Experiment for comparing our pipelines:
-50,000 passages release1.4.v test200's hierarchical qrel. (Re-rank) top500
+50,000 passages release1.4.v test200's hierarchical qrel.
 
 map    :0.0031
 r-prec :0.0027
@@ -233,8 +248,9 @@ Refactored redundant code and removed minimized non-essential code.
 
 Shilpa Dhagat:
 Implemented Rocchio algorithm based on Relevance feedback,
-Used top-100 paragraphs to perform entity-linking and re-rank those,
-Used caching for Tagme enhanced results to avoid server load,
+Merged Gaurav's retrieval methods to use Tagme enhanced data,
+Synced Colin's clustering with Tagme implementation.
+Used Gaurav's caching and re-rank methods to use the top-100 paragraphs for entity-linking.
 ```
 
 # Contributions Prototype 2
