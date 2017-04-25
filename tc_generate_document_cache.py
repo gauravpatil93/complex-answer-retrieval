@@ -26,7 +26,6 @@ passages_extract = args['passages_extract']
 tagme_flag = args['tagme_enhanced']
 
 ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract, enable_cache=True)
-
 query_structure = None
 document_structure = None
 
@@ -37,7 +36,7 @@ elif tagme_flag == "enhanced":
     query_structure = ranking.gather_entity_enhanced_queries_mentions()
     document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
 else:
-    print("Select enhanced or unenhanced")
+    print("Select enhanced or un_enhanced")
     exit()
 
 # Build cache for no of documents containing a specific word:
