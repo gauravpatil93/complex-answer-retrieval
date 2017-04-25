@@ -89,13 +89,6 @@ The aforementoned arguments can take the following value:
 [cache]                     : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
 [no of passages to extract] : an integer
 [use_tagme_enhancement]     : enhanced, un_enhanced
-
-
-For first run: The repo already includes a cached collection of 50,000 passages so to test either TFIDF(Delta) or DIRICHLET
-just run the following command 
-
-tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run DIRICHLET cache 50000
-tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run TFIDFIMPROVED cache 50000
 ```
 
 
