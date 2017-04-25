@@ -164,6 +164,8 @@ Example run:
 Gaurav's Results
 ============================================================================================================================
 using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
+Primary Scoring Algorithm: TFIDF Improved ( was better compared with BM25, BM25+ )
+Re-ranking Algorithm:      DIRICHLET
 
 Reranking top 10000:
 map   :0.15
@@ -185,8 +187,8 @@ r-prec :0.0027
 ============================================================================================================================
 Shilpa's Results
 ============================================================================================================================
-using test 200's hierarchical qrel file and 50,000 passages from release1.4.v
-Without Re-rank
+Experiment for comparing our pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
 
 mrr     :0.0012
 p@5     :0.00036
@@ -198,6 +200,8 @@ Colin's Results
 ============================================================================================================================
 using test 200's hierarchichal qrel file and 50,000 passages from release1.4.
 
+Experiment for comparing our pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
 python3 trec_cluster_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs TFIDFIMPROVED_cluster.run TFIDFIMPROVED 6 50000 20 
 
 map                     all 0.0009
