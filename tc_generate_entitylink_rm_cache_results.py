@@ -49,7 +49,6 @@ query_structure = None
 document_structure = None
 
 
-
 def execute_rocchio(query_text, corpus_text, ir):
     print('Executing Rocchio Algorithm')
     # User chooses the value of N (e.g. N=20) first documents in the ranking and marks them as being relevant or non-relevant

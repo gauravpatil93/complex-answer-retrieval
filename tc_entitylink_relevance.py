@@ -97,6 +97,7 @@ class EntityLinkingAndRelevance:
         return ranked_dict
 
     def gather_entity_enhanced_queries_mentions(self):
+        enhance_query_list = []
         for page in self.pages:
             for section_path in page.flat_headings_list():
                 query_id_plain = " ".join([page.page_name] + [section.heading for section in section_path])
