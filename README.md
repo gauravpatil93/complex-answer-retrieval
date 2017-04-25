@@ -172,9 +172,14 @@ Gaurav's Results
 ============================================================================================================================
 using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
 
-Reranking top 1000:
+Reranking top 10000:
+map   :0.15
+r-prec:0.21
 
-top 1000 without re-ranking:
+top 10000 without re-ranking:
+
+map   :0.13
+r-prec:0.15
 
 Experiment for comparing our pipelines:
 50,000 passages release1.4.v test200's hierarchical qrel.
