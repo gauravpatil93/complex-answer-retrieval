@@ -126,7 +126,14 @@ map=0.223)
 
 # Contributions Prototype 3
 ```
-Gaurav Patil: Re-ranking top n queries using multiple retrieval algorithms, Retrieving top n results for comparision, Expanded cache to all retrieval algorithms implemented in prototype 2, implemented caching for tagme enhanced queries and passages, Update datastructures for existing retrieval methods, Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, Refactored redundant code and removed minimized non-essential code.
+Gaurav Patil: 
+Re-ranking top n queries using multiple retrieval algorithms,
+Retrieving top n results for comparision, 
+Expanded cache to all retrieval algorithms implemented in prototype 2, 
+Implemented caching for tagme enhanced queries and passages, 
+Update datastructures for existing retrieval methods, 
+Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, 
+Refactored redundant code and removed minimized non-essential code.
 ```
 
 # Contributions Prototype 2
