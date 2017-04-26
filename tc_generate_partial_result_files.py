@@ -3,7 +3,7 @@ import os
 from tc_TFIDF_IMPROVED import TDELTAIDF
 from copy import deepcopy
 from trec_car.format_runs import *
-
+import gc
 iterator = 0
 
 query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
@@ -44,5 +44,7 @@ while iterator != 98:
                 temp_list.append(RankingEntry(x[0], x[1], rank, x[2]))
         format_run(writer, temp_list, exp_name='test')
         f.close()
+    query_scores.clear()
+    gc.collect()
     iterator += 1
 
