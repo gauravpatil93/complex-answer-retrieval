@@ -25,7 +25,7 @@ while iterator != 98:
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        for elem in temp_list:
+        for elem in temp_list[:100]:
             top_n_list.append((elem[0][1], elem[1], elem[2]))
         query_scores[query[1]] = deepcopy(top_n_list)
         queries_parsed += 1
