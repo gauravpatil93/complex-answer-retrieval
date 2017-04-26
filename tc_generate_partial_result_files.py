@@ -9,6 +9,7 @@ iterator = 0
 query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
 
 while iterator != 98:
+    print("FileNo: " + str(iterator))
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
     logic_instance = TDELTAIDF(query_structure, document_structure)
