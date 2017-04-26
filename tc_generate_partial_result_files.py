@@ -8,7 +8,7 @@ iterator = 0
 
 query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
 
-while iterator != 10:
+while iterator != 98:
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
     logic_instance = TDELTAIDF(query_structure, document_structure)
@@ -44,12 +44,4 @@ while iterator != 10:
         format_run(writer, temp_list, exp_name='test')
         f.close()
     iterator += 1
-
-iterator_duo = 0
-while iterator_duo != 10:
-    with open("partial_files/" + "combined_result_set.run" , 'w') as outfile:
-        for fname in ["partial_files/" + "result_set" + str(0) + ".run", "partial_files/" + "result_set" + str(1) + ".run"]:
-            with open(fname) as infile:
-                for line in infile:
-                    outfile.write(line)
 
