@@ -46,7 +46,7 @@ class PartialRanking:
             for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = self.process_text_query(p.get_text())
                 counter += 1
-                if counter == 70000:
+                if counter == 100:
                     name_of_file = "para_collection" + str(inner_counter)
                     _pickle.dump(id_to_text_dict, open(os.path.join(os.curdir, "merge_cache/"+name_of_file), "wb"))
                     print("Created pickle dump for collection named " + name_of_file)
