@@ -163,6 +163,20 @@ Example run:
 ============================================================================================================================
 Gaurav's Results
 ============================================================================================================================
+using test 200's hierarchical qrel file and 7,000,000 passages from release1.4.v
+
+Scoring with TFIDF improved and reranking top 100 with Dirichlet ( Less penalty for lengthly documents )
+map   : 0.139   
+r-prec: 0.140
+
+Scoring with TFIDF improved and reranking top 1000 with Dirichlet ( Less penalty for lengthly documents )
+map   : 0.141   
+r-prec: 0.145
+
+Scoring with prototype 2's Dirichlet no reranking top 1000 
+map   : 0.157
+r-prec: 0.137
+
 using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
 Primary Scoring Algorithm: TFIDF Improved ( was better compared with BM25, BM25+ )
 Re-ranking Algorithm:      DIRICHLET
@@ -181,6 +195,8 @@ Experiment for comparing our pipelines:
 
 map    :0.0031
 r-prec :0.0027
+
+*** finally was able to create index for all 7million passages. You can find them in merge cache.
 
 
 
