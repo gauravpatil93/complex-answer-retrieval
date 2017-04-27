@@ -1,3 +1,8 @@
+"""
+Note: This is a static code written only for the purposes of testing 7 million on server
+For actual file generation refer to regular parameter taking files like tc_rerank_document_framework.py ( Git readme )
+"""
+
 iterator_duo = 0
 
 name_list = []

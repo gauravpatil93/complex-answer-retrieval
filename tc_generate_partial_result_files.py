@@ -1,3 +1,8 @@
+"""
+Note: This is a static code written only for the purposes of testing 7 million on server
+For actual file generation refer to regular parameter taking files like tc_rerank_document_framework.py ( Git readme )
+"""
+
 import _pickle
 import os
 from tc_TFIDF_IMPROVED import TDELTAIDF
@@ -8,7 +13,7 @@ iterator = 0
 
 query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
 
-while iterator != 98:
+while iterator != 9:
     print("FileNo: " + str(iterator))
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
