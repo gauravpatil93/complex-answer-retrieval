@@ -196,7 +196,12 @@ Experiment for comparing our pipelines:
 map    :0.0031
 r-prec :0.0027
 
-*** finally was able to create index for all 7million passages. You can find them in merge cache.
+*** 
+finally was able to create index for all 7million passages. You can find them in merge cache.
+Then made partial run files and then ran the evaluation as a mega file.
+tc_test_7million.py
+tc_modified_ranking_7million.py
+tc_merge_files.py
 
 
 
