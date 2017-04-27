@@ -268,6 +268,7 @@ Implemented caching for tagme enhanced queries and passages,
 Updated data structures for existing retrieval methods, 
 Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, 
 Refactored redundant code and removed minimized non-essential code.
+Created test suite and debugged the problem from last prototype. 
 
 Shilpa Dhagat:
 Implemented Rocchio algorithm based on Relevance feedback,
