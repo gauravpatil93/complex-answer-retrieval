@@ -61,7 +61,6 @@ class InterpretEntityLinking:
 
         tup = (filtered_entities_list, filtered_mentions_list)
         entity_mention_tup_list.append(tup)
-        print(entity_mention_tup_list)
         return entity_mention_tup_list
 
     def gather_entity_enhanced_queries_annotations(self):

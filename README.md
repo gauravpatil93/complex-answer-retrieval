@@ -2,7 +2,7 @@
 Repository contains code submission for CS 980 (Data Science) assignments
 
 ```
-List of dependencies:
+List of dependencies: ( No changes from prototype 2 )
 
 Run on Python 3.5.2
 NLTK           :conda install -c anaconda nltk=3.2.2
@@ -25,20 +25,71 @@ Caching mechanism implemented for TFIDF(Delta) and DIRICHLET SMOOTHING METHODS s
 
 If running tests on TFIDF(Delta) and DIRICHLET
 ```
-# Generating Cache
+# Generating Cache ( Note: Updated in Prototype 3 )
 ```
-tc_generate_document_cache.py [outlines file] [paragraphs file] [no of passages to extracts from paragraph file]
+** Caching now works with tagme queries ** 
+
+tc_generate_document_cache.py [outlines file] [paragraphs file] [no of passages to extracts from paragraph file] [use_tagme_enhancement]
+
+[use_tagme_enhancement] : enhanced, un_enhanced
 ```
 
-# Generating trec_eval compatible results file
+# (top-n re-ranked)Generating trec_eval compatible results using top n re-ranking algorithm ( Note: New in prototype 3 )
 ```
-tc_generate_document.py [outlines file] [paragraphs file] [output file] [ranking function] [cache] [no of passages to extract]
+python tc_rerank_document_framework.py [outlines file] [paragraphs file] [output file] [primary_retrieval_algorithm] [re-ranking_algorithm] [cache] [no_of_results_to_re-rank] [no of passages to extract] [use_tagme_enhancement]
+
+The aforementoned arguments can take the following value:
+
+[primary_retrieval_algorithm]: BM25, BM25+, TFIDFIMPROVED
+[re-ranking_algorithm]       : DIRICHLET
+[cache]                      : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
+[no_of_results_to_re-rank]   : an integer (less than no of passages being extracted)
+[no of passages to extract]  : an integer
+[use_tagme_enhancement]      : enhanced, un_enhanced
+
+Sample Run Statement:
+
+Note: For a quick result evaluation use the un_enhanced but if you want to use enhanced generate the cache first.
+
+python tc_rerank_document_framework.py all.test200.cbor.outlines release-v1.4.paragraphs output.top500reranked.run TFIDFIMPROVED DIRICHLET no_cache 500 50000 un_enhanced
+```
+
+# (top-n not re-ranked)Generating trec_eval compatible results top - n without reranking ( Note: New in prototype 3 )
+```
+**** Note:
+This is only to compare the top n implementation as results from top n might be a little bit lower than the the entire thing this is a good way to generate a top n only results file without re ranking to compare it with the re-ranked implementation
+***** 
+
+python tc_rerank_document_framework.py [outlines file] [paragraphs file] [output file] [ranking_function] [cache] [top_n_only] [no of passages to extract] [use_tagme_enhancement]
+
+The aforementoned arguments can take the following value:
+
+[ranking_function]: BM25, BM25+, TFIDFIMPROVED, DIRICHLET
+[cache]                      : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
+[top_n_results_only]         : an integer (less than no of passages being extracted)
+[no of passages to extract]  : an integer
+[use_tagme_enhancement]      : enhanced, un_enhanced
+
+Sample Run Statement:
+
+Note: For a quick result evaluation use the un_enhanced but if you want to use enhanced generate the cache first.
+
+python tc_rerank_document_framework.py all.test200.cbor.outlines release-v1.4.paragraphs output.top500notreranked.run DIRICHLET no_cache 500 50000 un_enhanced
+```
+
+
+
+# Generating trec_eval compatible results file all results ( Note: Updated in Prototype 3 )
+```
+tc_generate_document.py [outlines file] [paragraphs file] [output file] [ranking function] [cache] [no of passages to extract] [use_tagme_enhancement]
 
 The aforementoned arguments can take the following value:
 
 [ranking function]          : BM25, BM25+, TFIDFIMPROVED, DIRICHLET
 [cache]                     : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
 [no of passages to extract] : an integer
+[use_tagme_enhancement]     : enhanced, un_enhanced
+
 
 For first run: The repo already includes a cached collection of 50,000 passages so to test either TFIDF(Delta) or DIRICHLET
 just run the following command 
@@ -92,9 +143,34 @@ Not correctly functioning source code for that in trec_cluster_full. For evaluat
 ```
 
 
-# Results 
+# Results (Updated from Prototype 3)
 
 ```
+**************** Prototype 3 Results: ****************
+============================================================================================================================
+Gaurav's Results
+============================================================================================================================
+using test 200's hierarchichal qrel file and 1,000,000 passages from release1.4.v
+( Note results are lower than last time's dirichlet's implementation because only map for top n is always a little lower than the complete set )
+
+Reranking top 1000:
+
+map - 0.1348
+r-prec - 0.1548
+
+Calculating the map and r-prec for top 1000 without re-rank:
+
+
+
+============================================================================================================================
+Shilpa's Results
+============================================================================================================================
+
+
+
+
+
+**************** Prototype 2 Results: ****************
 DIRICHLETS SMOOTHING ALGORITHM
 
 using test 200's hierarchichal qrel file and 1,000,000 passages from release1.4.v
@@ -124,7 +200,24 @@ map=0.223)
 
 ```
 
-# Contributions
+# Contributions Prototype 3
+```
+Gaurav Patil: 
+Re-ranking top n queries using multiple retrieval algorithms,
+Retrieving top n results for comparision, 
+Expanded cache to all retrieval algorithms implemented in prototype 2, 
+Implemented caching for tagme enhanced queries and passages, 
+Updated data structures for existing retrieval methods, 
+Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, 
+Refactored redundant code and removed minimized non-essential code.
+
+Shilpa Dhagat:
+Implemented Rocchio algorithm based on Relevance feedback,
+Used top-100 paragraphs to perform entity-linking and re-rank those,
+Used caching for Tagme enhanced results to avoid server load,
+```
+
+# Contributions Prototype 2
 ```
 Gaurav Patil: BM25, BM25+, DIRICHLETS, TFIDF Improved, Text Processing Algorithms and Cachcing 
 Colin Etzel : Implemented clustering and work towards integrating with DIRICHLETS (see section "Clustering Implementation")

@@ -17,16 +17,28 @@ parser = argparse.ArgumentParser()
 parser.add_argument("outline_file", type=str, help="Qualified location of the outline file")
 parser.add_argument("paragraph_file", type=str, help="Qualified location of the paragraph file")
 parser.add_argument("passages_extract",type=int, help="no of passages to extract")
+parser.add_argument("tagme_enhanced", type=str, help="enhanced or un_enhanced")
 args = vars(parser.parse_args())
 
 query_cbor = args['outline_file']
 paragraphs_cbor = args['paragraph_file']
 passages_extract = args['passages_extract']
+tagme_flag = args['tagme_enhanced']
 
 ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract, enable_cache=True)
 
-query_structure = ranking.gather_queries()
-document_structure = ranking.gather_paragraphs()
+query_structure = None
+document_structure = None
+
+if tagme_flag == "un_enhanced":
+    query_structure = ranking.gather_queries()
+    document_structure = ranking.gather_paragraphs()
+elif tagme_flag == "enhanced":
+    query_structure = ranking.get_enhanced_queries()
+    document_structure = ranking.get_enhanced_paragraphs()
+else:
+    print("Select enhanced or unenhanced")
+    exit()
 
 # Build cache for no of documents containing a specific word:
 no_of_docs_with_term = dict()
