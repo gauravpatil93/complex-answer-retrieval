@@ -13,13 +13,14 @@ from tc_BM25_ranking import BM25
 """
 Run this file to generate the results.run file
 
-This file takes 5 arguments.
+This file takes 6 arguments.
 
 outline file
 paragraph file
 output run file
 retrieval algorithm (BM25, TFIDFIMPROVED, DIRICHLET)
 cache or no_cache
+passages count
 
 @author: Shilpa Dhagat
 
@@ -53,13 +54,13 @@ if retrieval_algorithm == 'DIRICHLET':
             _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
         DIRICHLET.all_words_freq_dict = _pickle.load(
             open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        primary = DIRICHLET(query_structure, document_structure)
+        primary = DIRICHLET(query_structure, document_structure, 2500)
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
         query_structure = ranking.gather_entity_enhanced_queries_mentions()
         document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
-        primary = DIRICHLET(query_structure, document_structure)
+        primary = DIRICHLET(query_structure, document_structure, 2500)
 
 
 elif retrieval_algorithm == 'TFIDFIMPROVED':
