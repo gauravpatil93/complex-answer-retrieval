@@ -208,13 +208,19 @@ tc_merge_files.py
 ============================================================================================================================
 Shilpa's Results
 ============================================================================================================================
+Test200 outline and qrel file and 7,000,000 passages from release1.4.v
+Entity link with Dirichlet 
+
+map	: 0.1377
+r-prec  : 0.1332
+
 Experiment for comparing our pipelines:
 50,000 passages release1.4.v test200's hierarchical qrel.
 
 mrr     :0.0012
 p@5     :0.00036
 r-prec  :0.00075
-map     :0.00082)
+map     :0.00082
 
 ============================================================================================================================
 Colin's Results
@@ -272,7 +278,7 @@ Created test suite and debugged the problem from last prototype.
 
 Shilpa Dhagat:
 Implemented Rocchio algorithm based on Relevance feedback,
-Merged Gaurav's retrieval methods to use Tagme enhanced data,
+Merged entity linking implementation with Gaurav's code, Code now takes a parameter to run the pipeline with or without tagme expansion.
 Synced Colin's clustering with Tagme implementation.
 Used Gaurav's caching and re-rank methods to use the top-100 paragraphs for entity-linking.
 ```
