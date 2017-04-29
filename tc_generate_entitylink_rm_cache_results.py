@@ -9,19 +9,18 @@ from tc_DIRICHLET import DIRICHLET
 from tc_Ranking import Ranking
 from tc_TFIDF_IMPROVED import TDELTAIDF
 from tc_BM25_ranking import BM25
-from tc_Rocchio_algo import RocchioAlgorithm
-from tc_entitylink_relevance import EntityLinkingAndRelevance
 
 """
 Run this file to generate the results.run file
 
-This file takes 5 arguments.
+This file takes 6 arguments.
 
 outline file
 paragraph file
 output run file
 retrieval algorithm (BM25, TFIDFIMPROVED, DIRICHLET)
 cache or no_cache
+passages count
 
 @author: Shilpa Dhagat
 
@@ -43,30 +42,10 @@ retrieval_algorithm = args['retrieval_algorithm']
 cache_flag = args['use_cache']
 passages_count = args['passages_count']
 
+primary = None
 re_rank = None
 query_structure = None
 document_structure = None
-
-
-
-def execute_rocchio(query_text, corpus_text, ir):
-    print('Executing Rocchio Algorithm')
-    # User chooses the value of N (e.g. N=20) first documents in the ranking and marks them as being relevant or non-relevant
-    user_input = input(
-        "Enter the value of N \n")
-
-    # Convert to a list
-
-    rankings = [list(i) for i in ir.ranking_query[1]]
-    pos = 0
-    while pos < 20:
-        answer = input("Is relevant the document ID " + str(rankings[pos][0]) + " (Y/N)?")
-        if (answer == 'y') or (answer == 'Y'):
-            rankings[pos][1] = 1
-        pos += 1
-        # the system updates the original query based on Rocchio's formula.
-    rocchio = RocchioAlgorithm(query_text, corpus_text, rankings, ir)
-
 
 if retrieval_algorithm == 'DIRICHLET':
     if cache_flag == 'cache':
@@ -75,13 +54,13 @@ if retrieval_algorithm == 'DIRICHLET':
             _pickle.load(open(os.path.join(os.curdir, "cache/no_of_words_in_the_collection"), "rb"))
         DIRICHLET.all_words_freq_dict = _pickle.load(
             open(os.path.join(os.curdir, "cache/all_terms_freq_dict"), "rb"))
-        primary = DIRICHLET(query_structure, document_structure)
+        primary = DIRICHLET(query_structure, document_structure, 2500)
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
-        primary = DIRICHLET(query_structure, document_structure)
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
+        primary = DIRICHLET(query_structure, document_structure, 2500)
 
 
 elif retrieval_algorithm == 'TFIDFIMPROVED':
@@ -99,8 +78,8 @@ elif retrieval_algorithm == 'TFIDFIMPROVED':
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         primary = TDELTAIDF(query_structure, document_structure)
 
 
@@ -119,8 +98,8 @@ elif retrieval_algorithm == "BM25":
 
     else:
         ranking = Ranking(query_cbor, paragraphs_cbor, passages_count)
-        query_structure = ranking.get_enhanced_queries()
-        document_structure = ranking.get_enhanced_paragraphs()
+        query_structure = ranking.gather_entity_enhanced_queries_mentions()
+        document_structure = ranking.gather_entity_enhanced_paragraphs_mentions()
         primary = BM25(query_structure, document_structure)
 
 # Generate the query scores

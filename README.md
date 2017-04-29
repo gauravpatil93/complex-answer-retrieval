@@ -89,13 +89,6 @@ The aforementoned arguments can take the following value:
 [cache]                     : no_cache, cache ( Note 'cache' only works if tc_generate_document_cache.py is run first on same number of passages )
 [no of passages to extract] : an integer
 [use_tagme_enhancement]     : enhanced, un_enhanced
-
-
-For first run: The repo already includes a cached collection of 50,000 passages so to test either TFIDF(Delta) or DIRICHLET
-just run the following command 
-
-tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run DIRICHLET cache 50000
-tc_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs output.DIRICHLET.run TFIDFIMPROVED cache 50000
 ```
 
 
@@ -134,14 +127,34 @@ eval_framework.py [qrels] [run]
 Implemented by Colin
 in folder trec_cluster_basic run the run.sh script to get a sample clustering followed by ranking
 Accepts inputs and explains possible input values on running with no arguments.
-However, crashes for runs with large sizes of number of clusters (number of queries).
 
 
-A more efficient method for assigning queries to clusters will be needed for applied use. Almost synced up to run on modified
-results for Dirchilets smoothing algorithm but the above problem prevents that.
-Not correctly functioning source code for that in trec_cluster_full. For evaluation of how that is coming along the code files not identical to an iteration of Gaurav's implementation are trec_cluster_generate_document.py (the main program file), and cluster_kmeans.py (a callable version of the kmeans clustering and mapping returning rankings). trec_cluster_Ranking.py just has slight modifications to Gaurav's ranking class to have his code give output processable by clustering.
+Now (prototype 3) synced up with guarav's implementation in trec_cluster_generate_document.py, but no caching achieved
+
+to run
+
+python3 trec_cluster_generate_document.py [outline.cbor] [paragraphs.cbor] [outputfilename] [rankingfunction] [number of additional clusters] [number of passages to extract] [passages per section]
 ```
+# Entity Linking with relevance model Implementation
+```
+First create Cache for Tagme me enhanced data using Gaurav's Cache implemenatation:
+tc_generate_document_cache.py 
+This file takes three input parameters:
+Outline file, paragraph file and number of passages you want to extract.
+Example run: 
+python tc_generate_document_cache.py all.test200.cbor.outlines release-v1.4.paragraphs 50000
 
+tc_generate_entitylink_rm_cache_results.py for performing entity linking with query expansion using rocchio relevance model. This will generate output file used in evaluation framework. This file takes 6 parameters:
+outlines file, paragraph file, output file, retrieval algorithm, use_cache and number of passages to extract
+Example run: 
+python tc_generate_entitylink_rm_cache_results.py all.test200.cbor.outlines release-v1.4.paragraphs output.run BM25 cache 50000
+
+Finally run the evaluation framework:
+eval_framework.py This is for evaluating the results. This takes two parameters:
+qrels file and output file
+Example run: 
+	python eval_framework.py all.test200.cbor.hierarchical.qrels output.run
+```
 
 # Results (Updated from Prototype 3)
 
@@ -150,25 +163,76 @@ Not correctly functioning source code for that in trec_cluster_full. For evaluat
 ============================================================================================================================
 Gaurav's Results
 ============================================================================================================================
-using test 200's hierarchichal qrel file and 1,000,000 passages from release1.4.v
-( Note results are lower than last time's dirichlet's implementation because only map for top n is always a little lower than the complete set )
+using test 200's hierarchical qrel file and 7,000,000 passages from release1.4.v
 
-Reranking top 1000:
+Scoring with TFIDF improved and reranking top 100 with Dirichlet ( Less penalty for lengthly documents )
+map   : 0.139   
+r-prec: 0.140
 
-map - 0.1348
-r-prec - 0.1548
+Scoring with TFIDF improved and reranking top 1000 with Dirichlet ( Less penalty for lengthly documents )
+map   : 0.141   
+r-prec: 0.145
 
-Calculating the map and r-prec for top 1000 without re-rank:
+Scoring with prototype 2's Dirichlet no reranking top 1000 
+map   : 0.157
+r-prec: 0.137
+
+using test 200's hierarchical qrel file and 1,000,000 passages from release1.4.v
+Primary Scoring Algorithm: TFIDF Improved ( was better compared with BM25, BM25+ )
+Re-ranking Algorithm:      DIRICHLET
+
+Reranking top 10000:
+map   :0.15
+r-prec:0.21
+
+top 10000 without re-ranking:
+
+map   :0.13
+r-prec:0.15
+
+Experiment for comparing our pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
+
+map    :0.0031
+r-prec :0.0027
+
+*** 
+finally was able to create index for all 7million passages. You can find them in merge cache.
+Then made partial run files and then ran the evaluation as a mega file.
+tc_test_7million.py
+tc_modified_ranking_7million.py
+tc_merge_files.py
 
 
 
 ============================================================================================================================
 Shilpa's Results
 ============================================================================================================================
+Test200 outline and qrel file and 7,000,000 passages from release1.4.v
+Entity link with Dirichlet 
 
+map	: 0.1377
+r-prec  : 0.1332
 
+Experiment for comparing our pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
 
+mrr     :0.0012
+p@5     :0.00036
+r-prec  :0.00075
+map     :0.00082
 
+============================================================================================================================
+Colin's Results
+============================================================================================================================
+using test 200's hierarchichal qrel file and 50,000 passages from release1.4.
+
+Experiment for comparing our pipelines:
+50,000 passages release1.4.v test200's hierarchical qrel.
+python3 trec_cluster_generate_document.py all.test200.cbor.outlines release-v1.4.paragraphs TFIDFIMPROVED_cluster.run TFIDFIMPROVED 6 50000 20 
+
+map                     all 0.0009
+Rprec                   all 0.0009
 
 **************** Prototype 2 Results: ****************
 DIRICHLETS SMOOTHING ALGORITHM
@@ -210,11 +274,13 @@ Implemented caching for tagme enhanced queries and passages,
 Updated data structures for existing retrieval methods, 
 Merged entity linking from prototype 2 to re-ranking module to complete the pipeline, 
 Refactored redundant code and removed minimized non-essential code.
+Created test suite and debugged the problem from last prototype. 
 
 Shilpa Dhagat:
 Implemented Rocchio algorithm based on Relevance feedback,
-Used top-100 paragraphs to perform entity-linking and re-rank those,
-Used caching for Tagme enhanced results to avoid server load,
+Merged entity linking implementation with Gaurav's code, Code now takes a parameter to run the pipeline with or without tagme expansion.
+Synced Colin's clustering with Tagme implementation.
+Used Gaurav's caching and re-rank methods to use the top-100 paragraphs for entity-linking.
 ```
 
 # Contributions Prototype 2
