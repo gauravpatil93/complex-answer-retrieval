@@ -51,10 +51,10 @@ def readRunFile(filepath):
 
 def makeParagraphTupleSet(passageIDs, passageDictionary,passages_per_section):
     "Create list of (paragraphid, paragraphtext) tuples given a list of passageIDs"
-    passageIDs = passageIDs[0:passages_per_section]
+    passageIDs = passageIDs[:passages_per_section]
     results = list()
     for pid in passageIDs:
-        results.append((pid,passageDictionary[pid]))
+        results.append((pid,Ranking.process_text_query_plain(passageDictionary[pid])))
     return set(results)
 
 
@@ -71,8 +71,10 @@ passages_per_section = args['passages per section']
 print("Loading data from CBOR...")
 ranking = Ranking(query_cbor, paragraphs_cbor, passages_extract)
 #query_structure = ranking.gather_queries()
-document_texts = ranking.gather_paragraphs_plain()
+document_texts = ranking.gather_paragraphs_plain_noprocessing()
 page_structure = ranking.gather_pages()
+
+print("Loaded structures")
 
 #print(query_structure[0])
 #generate a list of sectionIds for each page

@@ -61,7 +61,7 @@ def generateRanking(sectionName, bagOfParagraphs, labels):
     """
     return(sortedList)
 
-def runKMeansPipeline(myData, num_clusters=None):
+def runKMeansPipeline(myData, num_clusters=None, processText=False):
     """Runs kmeans on a single page's worth of passages and section names
     Input: pagename (str), query names (section_names) (str), cluster_paragraphs (list[passageids,passagetext]),
     queryIds (string)
@@ -74,13 +74,12 @@ def runKMeansPipeline(myData, num_clusters=None):
     if(num_clusters is not None):
         NUM_EXTRA_CLUSTERS = num_clusters
 
-
     section_names_formatted = [Ranking.process_text_query_plain(section_name) for section_name in section_names]
     
     cluster_pTexts = [paragraph[1] for paragraph in cluster_paragraphs]
     numClusters = len(section_names) + NUM_EXTRA_CLUSTERS 
     print("\n\nRunning Kmeans on page ''%s''\n" %(pageName))
-
+    
     if(len(cluster_pTexts) < numClusters):
         print("Fewer paragraphs to cluster than clusters, setting number of clusters = number of paragraphs")
         numClusters = len(cluster_pTexts)

@@ -67,6 +67,13 @@ class Ranking:
             for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query_plain(p.get_text())
         return id_to_text_dict
+
+    def gather_paragraphs_plain_noprocessing(self):
+        id_to_text_dict = dict()
+        with open(self.paragraph_file, 'rb') as f:
+            for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
+                id_to_text_dict[p.para_id] = p.get_text()
+        return id_to_text_dict
         
     @staticmethod
     def process_text_query(input_text: str):
