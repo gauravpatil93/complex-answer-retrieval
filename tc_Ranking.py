@@ -51,7 +51,7 @@ class Ranking:
         """
         id_to_text_dict = dict()
         with open(self.paragraph_file, 'rb') as f:
-            for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract):
+            for p in itertools.islice(iter_paragraphs(f), 0, self.passages_extract, 100):
                 id_to_text_dict[p.para_id] = Ranking.process_text_query(p.get_text())
         if self.enable_cache is True:
             print(" Paragraph cache created successfully ")
