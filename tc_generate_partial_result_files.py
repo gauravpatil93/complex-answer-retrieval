@@ -70,6 +70,9 @@ for query in query_structure:
     for elem in temp_list[:1000]:
         top_n_list.append((elem[0][1], elem[1], elem[2]))
     query_scores[query[1]] = deepcopy(top_n_list)
+    temp_list.clear()
+    top_n_list.clear()
+    gc.collect()
     queries_parsed += 1
 
 # Write the results to a file
