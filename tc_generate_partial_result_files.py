@@ -124,6 +124,26 @@ for query in query_structure:
     logic_instance = TDELTAIDF(query_structure, document_structure)
     for key, value in document_structure.items():
         temp_list.append(logic_instance.score(query, key))
+    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection26", "rb")))
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
+    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection27", "rb")))
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
+    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection28", "rb")))
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
+    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection29", "rb")))
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
+    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection30", "rb")))
+    logic_instance = TDELTAIDF(query_structure, document_structure)
+    for key, value in document_structure.items():
+        temp_list.append(logic_instance.score(query, key))
     temp_list.sort(key=lambda m: m[2])
     temp_list.reverse()
     for elem in temp_list[:1000]:
