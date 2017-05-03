@@ -20,130 +20,16 @@ for query in query_structure:
     temp_list = []
     top_n_list = []
     print(queries_parsed)
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection0"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection1"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection2"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection3"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection4"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection5"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection6"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection7"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection8"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection9"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection10"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection11"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection12"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection13"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection14"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection15"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection16"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection17"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection18"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection19"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection20"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection21"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection22"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection23"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection24"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection25"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection26"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection27"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection28"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection29"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
-    document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection30"), "rb"))
-    logic_instance = TDELTAIDF(query_structure, document_structure)
-    for key, value in document_structure.items():
-        temp_list.append(logic_instance.score(query, key))
+
+    inner_loop_counter = 0
+    while inner_loop_counter != 98:
+        document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection" +
+                                                            str(inner_loop_counter)), "rb"))
+        logic_instance = TDELTAIDF(query_structure, document_structure)
+        for key, value in document_structure.items():
+            temp_list.append(logic_instance.score(query, key))
+        inner_loop_counter += 1
+
     temp_list.sort(key=lambda m: m[2])
     temp_list.reverse()
     for elem in temp_list[:1000]:
