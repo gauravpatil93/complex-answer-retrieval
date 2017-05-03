@@ -22,7 +22,7 @@ for query in query_structure:
     print(queries_parsed)
 
     inner_loop_counter = 0
-    while inner_loop_counter != 10:
+    while inner_loop_counter != 5:
         document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection" +
                                                             str(inner_loop_counter)), "rb"))
         logic_instance = TDELTAIDF(query_structure, document_structure)
