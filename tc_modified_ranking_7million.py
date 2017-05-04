@@ -10,7 +10,6 @@ import gc
 @author: Gaurav Patil.
 """
 
-
 class PartialRanking:
     cache_words = dict()
 

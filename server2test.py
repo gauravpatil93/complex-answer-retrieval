@@ -4,11 +4,11 @@ from tc_TFIDF_IMPROVED import TDELTAIDF
 from copy import deepcopy
 from trec_car.format_runs import *
 import gc
-iterator = 0
+iterator = 21
 
-query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache"), "rb"))
+query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/query_structure_cache_new"), "rb"))
 
-while iterator != 98:
+while iterator != 41:
     print("FileNo: " + str(iterator))
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
@@ -25,7 +25,7 @@ while iterator != 98:
             temp_list.append(logic_instance.score(query, key))
         temp_list.sort(key=lambda m: m[2])
         temp_list.reverse()
-        for elem in temp_list[:100]:
+        for elem in temp_list[:1000]:
             top_n_list.append((elem[0][1], elem[1], elem[2]))
         query_scores[query[1]] = deepcopy(top_n_list)
         queries_parsed += 1
