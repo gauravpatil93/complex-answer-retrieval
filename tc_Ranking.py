@@ -17,7 +17,6 @@ This class contains methods that generate the structure that is used by the rank
 @author: Gaurav Patil.
 """
 
-
 class Ranking:
 
     stop_words = stopwords.words('english')
