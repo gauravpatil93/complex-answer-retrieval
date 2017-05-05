@@ -4,11 +4,11 @@ from tc_DIRICHLET import DIRICHLET
 from copy import deepcopy
 from trec_car.format_runs import *
 import gc
-iterator = 0
+iterator = 31
 
 query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/train_queries"), "rb"))
 
-while iterator != 2:
+while iterator != 41:
     print("FileNo: " + str(iterator))
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
