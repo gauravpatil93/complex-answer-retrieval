@@ -89,4 +89,4 @@ class PartialRanking:
                 query_id_formatted = "/".join([page.page_id] + [section.headingId for section in section_path])
                 tup = (query_id_plain, query_id_formatted, self.process_text_query(query_id_plain))
                 query_tup_list.append(tup)
-        _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/train_queries"), "wb"))
+        _pickle.dump(query_tup_list, open(os.path.join(os.curdir, "cache/test_queries"), "wb"))
