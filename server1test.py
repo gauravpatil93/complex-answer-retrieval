@@ -1,6 +1,6 @@
 import _pickle
 import os
-from tc_DIRICHLET import DIRICHLET
+from tc_TFIDF_IMPROVED import TDELTAIDF
 from copy import deepcopy
 from trec_car.format_runs import *
 import gc
@@ -12,12 +12,12 @@ while iterator != 2:
     print("FileNo: " + str(iterator))
     output_file_name = "partial_files/" + "result_set" + str(iterator) + ".run"
     document_structure = _pickle.load(open(os.path.join(os.curdir, "merge_cache/para_collection"+str(iterator)), "rb"))
-    logic_instance = DIRICHLET(query_structure, document_structure, 40)
+    logic_instance = TDELTAIDF(query_structure, document_structure)
     # Generate the query scores
     print("Generating the output structure by calculating scores................\n")
     query_scores = dict()
     queries_parsed = 0
-    for query in query_structure:
+    for query in query_structure[:10]:
         temp_list = []
         top_n_list = []
         print(queries_parsed)
