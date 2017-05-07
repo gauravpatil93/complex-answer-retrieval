@@ -15,7 +15,7 @@ class Test:
     def run_ranking(self):
         iterator = self.start
 
-        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/test_queries"), "rb"))
+        query_structure = _pickle.load(open(os.path.join(os.curdir, "cache/test200_queries"), "rb"))
 
         while iterator != self.stop:
             print("FileNo: " + str(iterator))
